@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? ''
 
 export class ApiError extends Error {
   status: number
@@ -11,8 +11,8 @@ export class ApiError extends Error {
 }
 
 /**
- * fetch 래퍼. BASE_URL 접두, JSON 직렬화, 에러 throw를 담당한다.
- * 필요해지면 axios로 교체하거나 인터셉터(토큰 갱신 등)를 여기에 추가.
+ * fetch 래퍼. BASE_URL 접두, JSON 헤더, 에러 throw를 담당한다.
+ * 토큰 첨부/갱신 같은 공통 로직이 필요해지면 여기에 추가.
  */
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {

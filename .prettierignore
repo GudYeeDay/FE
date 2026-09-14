@@ -1,3 +1,6 @@
-dist
 node_modules
+.expo
+dist
+ios
+android
 pnpm-lock.yaml
