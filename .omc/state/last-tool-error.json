@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__Claude_Browser__preview_start",
+  "tool_input_preview": "{\"name\":\"dev\"}",
+  "error": "No .claude/launch.json found. Create /Users/jwon/Downloads/files/.claude/launch.json with this format:\n{\n  \"version\": \"0.0.1\",\n  \"configurations\": [\n    {\n      \"name\": \"<unique-name>\",\n      \"runtimeExecutable\": \"<command>\",\n      \"runtimeArgs\": [\"<args>\"],\n      \"port\": <port>\n    }\n  ]\n}\nSet \"runtimeExecutable\" to the command (e.g. \"npm\"), \"runtimeArgs\" to the arguments (e.g. [\"run\", \"dev\"]), and \"port\" to the server port. An optional \"url\" (http/https) opens the preview there instead of http...",
+  "timestamp": "2026-09-14T08:06:43.835Z",
+  "retry_count": 1
+}
