@@ -1,0 +1,12 @@
+// Figma 에서 내려받은 아이콘. 색이 바뀌는 아이콘은 currentColor 로 저장했으므로 `color` prop 으로 칠한다.
+export { default as CheckboxCheckedIcon } from '../../assets/icons/checkbox-checked.svg'
+export { default as ChevronLeftIcon } from '../../assets/icons/chevron-left.svg'
+export { default as ChevronLeftSmallIcon } from '../../assets/icons/chevron-left-small.svg'
+export { default as ChevronRightIcon } from '../../assets/icons/chevron-right.svg'
+export { default as EyeIcon } from '../../assets/icons/eye.svg'
+export { default as EyeClosedIcon } from '../../assets/icons/eye-closed.svg'
+export { default as PlusIcon } from '../../assets/icons/plus.svg'
+export { default as TabHomeIcon } from '../../assets/icons/tab-home.svg'
+export { default as TabCalendarIcon } from '../../assets/icons/tab-calendar.svg'
+export { default as TabArchiveIcon } from '../../assets/icons/tab-archive.svg'
+export { default as TabMyIcon } from '../../assets/icons/tab-my.svg'
