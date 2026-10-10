@@ -39,12 +39,17 @@ pnpm start                   # Metro 시작 → i(iOS) / a(Android) / w(웹)
 ## 폴더 구조
 
 ```
-app/                # Expo Router 라우트 (파일 = 화면)
-├── _layout.tsx     # 루트 레이아웃: QueryClientProvider, Stack, global.css
-└── index.tsx       # 홈 화면 (/)
+app/                    # Expo Router 라우트 (파일 = 화면)
+├── _layout.tsx         # 루트: 폰트 로드, QueryClientProvider, Stack
+├── (tabs)/             # 하단 탭: index(홈) · calendar · archive · my
+└── mission/new.tsx     # 탭 바 가운데 + 버튼 (모달)
 src/
-├── api/            # fetch 래퍼, 엔드포인트별 요청 함수
-├── components/     # 공용 UI 컴포넌트
+├── api/                # fetch 래퍼, 엔드포인트별 요청 함수
+├── components/
+│   ├── ui/             # Button, TextField, Checkbox
+│   ├── navigation/     # Header, BottomTabBar
+│   └── icons.ts        # assets/icons/*.svg 를 컴포넌트로 export
+├── theme/              # 컬러 토큰 (tailwind.config.js 와 공유)
 ├── hooks/          # 커스텀 훅 (useQuery 래핑, AppState 연동 등)
 └── lib/            # queryClient 등 앱 전역 인스턴스
 assets/             # 아이콘, 스플래시 이미지
@@ -57,6 +62,22 @@ tailwind.config.js  # NativeWind 프리셋, content 경로
 ## 환경 변수
 
 `EXPO_PUBLIC_` 접두사가 붙은 변수만 앱 번들에 포함됩니다. `process.env.EXPO_PUBLIC_API_BASE_URL` 로 접근합니다.
+
+## 디자인 시스템
+
+Figma 기준 토큰을 `tailwind.config.js` 에 등록했습니다.
+
+- 컬러: `main`, `main-soft`, `ink`, `ink-soft`, `ink-faint`, `line`, `bg`, `brand-10`~`brand-100`
+- 폰트: `font-ko` / `font-ko-medium` (Noto Sans KR), `font-en` / `font-en-medium` (Inter)
+- 크기: `text-ko-12` / `text-ko-14` / `text-ko-16` / `text-en-14` / `text-en-16` (행간·자간 포함)
+
+```tsx
+import { Button, Checkbox, Header, TextField } from '@/components'
+```
+
+- SVG 는 `assets/icons/` 에 두고 `src/components/icons.ts` 에서 export 합니다. 색이 바뀌는 아이콘은 `currentColor` 로 저장해 `color` prop 으로 칠합니다.
+- `Header` 는 레이아웃에 고정하지 않았습니다. 필요한 화면에서만 넣습니다.
+- 홈 탭은 현재 공용 컴포넌트 쇼케이스입니다. 홈 화면 작업 시 교체합니다.
 
 ## 메모
 
