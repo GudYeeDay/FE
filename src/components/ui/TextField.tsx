@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react'
+import { forwardRef, useState, type ReactNode } from 'react'
 import { Pressable, Text, TextInput, View, type TextInputProps } from 'react-native'
 
 import { EyeClosedIcon, EyeIcon } from '@/components/icons'
@@ -14,8 +14,12 @@ type TextFieldProps = Omit<TextInputProps, 'editable' | 'secureTextEntry'> & {
   errorMessage?: string
   /** 비밀번호 입력: 우측 eye 토글 */
   secure?: boolean
-  /** 읽기 전용 (Figma Readonly) */
+  /** 읽기 전용 (Figma Readonly): 회색 밑줄과 글자 */
   readOnly?: boolean
+  /** 입력만 막고 모양은 기본 상태 그대로 (예: 인증요청 전 인증번호 칸) */
+  disabled?: boolean
+  /** 입력칸 안 오른쪽에 붙는 요소 (예: 인증 타이머 3:00) */
+  trailing?: ReactNode
   /** 우측 액션 버튼 (Figma 인증요청) */
   action?: { label: string; onPress: () => void; disabled?: boolean }
   className?: string
@@ -33,7 +37,9 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
     errorMessage,
     secure,
     readOnly,
+    disabled,
     action,
+    trailing,
     className,
     onFocus,
     onBlur,
@@ -63,15 +69,19 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
         <View
           className={cn(
             'h-[43px] flex-1 flex-row items-center border-b pl-1',
-            secure ? 'pr-1' : 'pr-4',
+            secure || trailing ? 'pr-1' : 'pr-4',
             borderColor,
           )}
         >
           <TextInput
             ref={ref}
-            editable={!readOnly}
+            editable={!readOnly && !disabled}
             secureTextEntry={secure && hidden}
             placeholderTextColor={colors.ink.faint}
+            // 이메일·비밀번호·닉네임 입력에서 iOS 자동 수정이 값을 바꾸지 않도록 기본으로 끈다
+            autoCorrect={false}
+            spellCheck={false}
+            autoCapitalize="none"
             onFocus={(e) => {
               setFocused(true)
               onFocus?.(e)
@@ -86,6 +96,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
             )}
             {...inputProps}
           />
+          {trailing}
           {secure ? (
             <Pressable
               accessibilityRole="button"
