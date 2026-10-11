@@ -41,6 +41,7 @@ pnpm start                   # Metro 시작 → i(iOS) / a(Android) / w(웹)
 ```
 app/                    # Expo Router 라우트 (파일 = 화면)
 ├── _layout.tsx         # 루트: 폰트 로드, QueryClientProvider, Stack
+├── (auth)/             # 로그인 전: login · email-login · signup · terms · find-password
 ├── (tabs)/             # 하단 탭: index(홈) · calendar · archive · my
 └── mission/new.tsx     # 탭 바 가운데 + 버튼 (모달)
 src/
@@ -49,6 +50,7 @@ src/
 │   ├── ui/             # Button, TextField, Checkbox
 │   ├── navigation/     # Header, BottomTabBar
 │   └── icons.ts        # assets/icons/*.svg 를 컴포넌트로 export
+├── features/auth/      # 세션, 입력 규칙(validation), 이메일 인증 훅
 ├── theme/              # 컬러 토큰 (tailwind.config.js 와 공유)
 ├── hooks/          # 커스텀 훅 (useQuery 래핑, AppState 연동 등)
 └── lib/            # queryClient 등 앱 전역 인스턴스
@@ -78,6 +80,14 @@ import { Button, Checkbox, Header, TextField } from '@/components'
 - SVG 는 `assets/icons/` 에 두고 `src/components/icons.ts` 에서 export 합니다. 색이 바뀌는 아이콘은 `currentColor` 로 저장해 `color` prop 으로 칠합니다.
 - `Header` 는 레이아웃에 고정하지 않았습니다. 필요한 화면에서만 넣습니다.
 - 홈 탭은 현재 공용 컴포넌트 쇼케이스입니다. 홈 화면 작업 시 교체합니다.
+
+## 인증 흐름
+
+로그인 → 이메일 로그인 / 회원가입 → 약관 동의 → 홈. 이메일 로그인에서 비밀번호 찾기로 갈 수 있습니다.
+
+- `app/_layout.tsx` 에서 `Stack.Protected` 로 로그인 여부에 따라 `(auth)` 와 `(tabs)` 를 나눕니다.
+- 입력 규칙과 에러 문구는 `src/features/auth/validation.ts` 한 곳에서 관리합니다.
+- 아직 API 가 없어서 로그인 상태는 메모리에만 있고, 인증번호는 시간 안에 4자리를 넣으면 통과합니다. 연동할 곳은 `TODO` 주석으로 표시해 두었습니다.
 
 ## 메모
 
