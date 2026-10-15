@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 
@@ -29,7 +29,11 @@ export function MissionRecommendModal({ visible, onClose }: Props) {
   const router = useRouter()
   const [step, setStep] = useState<Step>({ type: 'pick' })
   const { data: missions, isPending, isFetching, refetch } = useRecommendedMissions(visible)
-  const savedIds = useMissionStore((s) => s.savedIds)
+  const archive = useMissionStore((s) => s.archive)
+  const savedIds = useMemo(
+    () => new Set(archive.filter((a) => a.status === 'saved').map((a) => a.mission.id)),
+    [archive],
+  )
 
   // 닫을 때 다음에 열 때를 위해 처음 단계로 되돌린다
   const close = () => {

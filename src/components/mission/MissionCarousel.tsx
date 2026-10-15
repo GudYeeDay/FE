@@ -24,7 +24,7 @@ const CAROUSEL_HEIGHT = MISSION_CARD_HEIGHT + 27
 type Props = {
   missions: Mission[]
   savedIds: ReadonlySet<string>
-  onToggleSaved: (id: string) => void
+  onToggleSaved: (mission: Mission) => void
   onStart: (mission: Mission) => void
 }
 
@@ -62,7 +62,7 @@ export function MissionCarousel({ missions, savedIds, onToggleSaved, onStart }: 
           <MissionCard
             mission={mission}
             saved={savedIds.has(mission.id)}
-            onToggleSaved={() => onToggleSaved(mission.id)}
+            onToggleSaved={() => onToggleSaved(mission)}
             onStart={() => onStart(mission)}
           />
         </CarouselItem>
