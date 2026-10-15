@@ -43,14 +43,19 @@ app/                    # Expo Router 라우트 (파일 = 화면)
 ├── _layout.tsx         # 루트: 폰트 로드, QueryClientProvider, Stack
 ├── (auth)/             # 로그인 전: login · email-login · signup · terms · find-password
 ├── (tabs)/             # 하단 탭: index(홈) · calendar · archive · my
-└── mission/new.tsx     # 탭 바 가운데 + 버튼 (모달)
+├── archive/[id].tsx    # 저장한 미션 상세
+└── mission/            # new(커스텀 미션 추가·수정), active(진행 중 미션)
 src/
 ├── api/                # fetch 래퍼, 엔드포인트별 요청 함수
 ├── components/
 │   ├── ui/             # Button, TextField, Checkbox
 │   ├── navigation/     # Header, BottomTabBar
 │   └── icons.ts        # assets/icons/*.svg 를 컴포넌트로 export
-├── features/auth/      # 세션, 입력 규칙(validation), 이메일 인증 훅
+├── features/
+│   ├── auth/           # 세션, 입력 규칙(validation), 이메일 인증 훅
+│   ├── mission/        # 진행 중 미션·보관함 스토어, 추천 미션 API
+│   ├── home/           # 홈 요약 API
+│   └── calendar/       # 캘린더 기록 API
 ├── theme/              # 컬러 토큰 (tailwind.config.js 와 공유)
 ├── hooks/          # 커스텀 훅 (useQuery 래핑, AppState 연동 등)
 └── lib/            # queryClient 등 앱 전역 인스턴스
@@ -88,6 +93,10 @@ import { Button, Checkbox, Header, TextField } from '@/components'
 - `app/_layout.tsx` 에서 `Stack.Protected` 로 로그인 여부에 따라 `(auth)` 와 `(tabs)` 를 나눕니다.
 - 입력 규칙과 에러 문구는 `src/features/auth/validation.ts` 한 곳에서 관리합니다.
 - 아직 API 가 없어서 로그인 상태는 메모리에만 있고, 인증번호는 시간 안에 4자리를 넣으면 통과합니다. 연동할 곳은 `TODO` 주석으로 표시해 두었습니다.
+
+## 목업 데이터
+
+아직 API 가 없어서 홈·캘린더·추천 미션·보관함은 목업입니다. 각 `src/features/*/api.ts` 와 `src/features/mission/store.ts` 의 `TODO` 위치만 실제 API 로 바꾸면 됩니다. 예시 사진은 `assets/mock/` 에 있고 API 연동 후 삭제합니다.
 
 ## 메모
 
