@@ -1,85 +1,91 @@
-import { useState } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
 
-import { Button, Checkbox, Header, TextField } from '@/components'
+import { ActiveMissionBanner } from '@/components/home/ActiveMissionBanner'
+import { PastRecordCard } from '@/components/home/PastRecordCard'
+import { WeekStrip } from '@/components/home/WeekStrip'
+import { BellIcon } from '@/components/icons'
+import { useHomeSummary } from '@/features/home/api'
+import { useMissionStore } from '@/features/mission/store'
+import { colors } from '@/theme'
 
-// TODO: 홈 화면 디자인 작업 시 교체. 지금은 공용 컴포넌트 확인용 쇼케이스.
+/** Figma: 홈 */
 export default function HomeScreen() {
-  const [nickname, setNickname] = useState('')
-  const [password, setPassword] = useState('')
-  const [email, setEmail] = useState('')
-  const [agreeAll, setAgreeAll] = useState(true)
-  const [agreeTerms, setAgreeTerms] = useState(false)
-
-  const emailValid = /^\S+@\S+\.\S+$/.test(email)
+  const router = useRouter()
+  const { data, isPending } = useHomeSummary()
+  const activeMission = useMissionStore((s) => s.active)
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
-      <Header title="공용 컴포넌트" onBack={() => {}} />
-      <ScrollView contentContainerClassName="gap-8 px-5 pb-10 pt-4">
-        <Section title="TextField">
-          <TextField label="이메일/닉네임" placeholder="Pawket" />
-          <TextField
-            label="닉네임"
-            placeholder="닉네임을 입력하세요"
-            value={nickname}
-            onChangeText={setNickname}
-            errorMessage={nickname === '관리자' ? '사용할 수 없는 닉네임입니다' : undefined}
-          />
-          <TextField label="닉네임" value="내용 입력 완료" readOnly />
-          <TextField
-            label="비밀번호"
-            secure
-            value={password}
-            onChangeText={setPassword}
-            helperText="한글/영문 2~10자, 특수문자 사용 불가"
-            errorMessage={password.length > 10 ? '한글/영문 2~10자, 특수문자 사용 불가' : undefined}
-          />
-          <TextField
-            label="이메일"
-            placeholder="Pawket@gmail.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-            action={{ label: '인증요청', disabled: !emailValid, onPress: () => {} }}
-          />
-          <TextField
-            label="이메일"
-            value="Pawket@gmail"
-            errorMessage="이메일을 다시 확인해주세요"
-            action={{ label: '인증요청', disabled: true, onPress: () => {} }}
-          />
-        </Section>
-
-        <Section title="Checkbox">
-          <Checkbox checked={agreeAll} onChange={setAgreeAll} label="전체 동의합니다." />
-          <Checkbox
-            checked={agreeTerms}
-            onChange={setAgreeTerms}
-            label={
-              <Text className="font-ko text-ko-16 text-ink">
-                <Text className="text-main">[필수]</Text> 서비스 이용약관
+      <ScrollView contentContainerClassName="pb-28" showsVerticalScrollIndicator={false}>
+        {/* 인사 + 기록 일수 */}
+        <View className="flex-row items-start justify-between px-5 pt-3.5">
+          <View>
+            <Text className="font-ko text-[10px] leading-[17.6px] tracking-[-0.344px] text-ink">
+              {data?.nickname ?? ''} 님의 굳이데이
+            </Text>
+            <Text className="font-ko-bold text-ko-20 text-[#0D0D0D]">낭만을 기록해보세요</Text>
+          </View>
+          <View className="items-end">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="알림"
+              hitSlop={10}
+              // TODO: 알림함 화면 연결
+              onPress={() => {}}
+            >
+              <BellIcon width={16} height={16} color={colors.ink.DEFAULT} />
+            </Pressable>
+            <View className="mt-2.5 flex-row gap-1">
+              <Text className="font-en-medium text-en-12 leading-[17.6px] text-main">
+                {data?.recordDays ?? 0}
               </Text>
-            }
-          />
-        </Section>
+              <Text className="font-ko-medium text-ko-12 text-ink">일 기록</Text>
+            </View>
+          </View>
+        </View>
 
-        <Section title="Button">
-          <Button onPress={() => {}}>시작하기</Button>
-          <Button disabled>시작하기</Button>
-        </Section>
+        {isPending || !data ? (
+          <View className="h-80 items-center justify-center">
+            <ActivityIndicator color={colors.ink.faint} />
+          </View>
+        ) : (
+          <>
+            <View className="mt-4">
+              <WeekStrip week={data.week} />
+            </View>
+
+            <View className="mt-5 px-5">
+              <Text className="font-ko-bold text-[18px] leading-[28px] tracking-[0.38px] text-[#0D0D0D]">
+                지난 낭만들
+              </Text>
+              <Text className="mt-0.5 font-en-medium text-en-12 text-[#A4A4A4]">
+                그동안 쌓아온 기록을 다시 돌아보세요
+              </Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="mt-[18px]"
+              contentContainerClassName="gap-2 px-5"
+            >
+              {data.pastRecords.map((record) => (
+                <PastRecordCard key={record.id} record={record} />
+              ))}
+            </ScrollView>
+          </>
+        )}
       </ScrollView>
-    </SafeAreaView>
-  )
-}
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <View className="gap-5">
-      <Text className="font-en-medium text-en-16 text-ink-soft">{title}</Text>
-      {children}
-    </View>
+      {activeMission ? (
+        <View className="absolute bottom-6 w-full items-center px-5" pointerEvents="box-none">
+          <ActiveMissionBanner
+            mission={activeMission}
+            onPress={() => router.push('/mission/active')}
+          />
+        </View>
+      ) : null}
+    </SafeAreaView>
   )
 }
