@@ -54,7 +54,9 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
       <Stack.Protected guard={isSignedIn}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="mission/new" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="mission/new" />
+        <Stack.Screen name="mission/active" />
+        <Stack.Screen name="archive/[id]" />
       </Stack.Protected>
       <Stack.Protected guard={!isSignedIn}>
         <Stack.Screen name="(auth)" />
