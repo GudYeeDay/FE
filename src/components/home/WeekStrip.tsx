@@ -19,7 +19,7 @@ export function WeekStrip({ week }: { week: DayRecord[] }) {
   return (
     <View>
       {first && last ? (
-        <Text className="px-5 font-en-medium text-en-12 text-[#A4A4A4]">
+        <Text className="px-5 font-en-medium text-en-12 text-ink-soft">
           {formatDay(first)} - {formatDay(last)}
         </Text>
       ) : null}
