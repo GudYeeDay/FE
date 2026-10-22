@@ -24,7 +24,8 @@ export function Checkbox({ checked, onChange, label, disabled, className }: Chec
       hitSlop={8}
       className={cn('flex-row items-start gap-1', disabled && 'opacity-50', className)}
     >
-      <View className="size-6 items-center justify-center">
+      {/* 한글 글자가 줄 높이 안에서 아래쪽에 그려져서, 박스를 2px 내려 글자 가운데에 맞춘다 */}
+      <View className="mt-0.5 size-6 items-center justify-center">
         {checked ? (
           <CheckboxCheckedIcon width={24} height={24} />
         ) : (
