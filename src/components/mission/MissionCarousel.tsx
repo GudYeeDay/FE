@@ -64,6 +64,7 @@ export function MissionCarousel({ missions, savedIds, onToggleSaved, onStart }: 
             saved={savedIds.has(mission.id)}
             onToggleSaved={() => onToggleSaved(mission)}
             onStart={() => onStart(mission)}
+            variant={index}
           />
         </CarouselItem>
       ))}
