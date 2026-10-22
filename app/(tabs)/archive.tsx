@@ -53,11 +53,11 @@ export default function ArchiveScreen() {
               key={item.mission.id + item.status}
               index={index}
               item={item}
-              // TODO: 완료한 미션은 "미션 완료 기록" 화면으로 연결
-              onPress={
-                item.status === 'saved'
-                  ? () => router.push(`/archive/${item.mission.id}`)
-                  : undefined
+              onPress={() =>
+                router.push({
+                  pathname: '/archive/[id]',
+                  params: { id: item.mission.id, status: item.status },
+                })
               }
               onPressMore={() => setSheetItem(item)}
             />

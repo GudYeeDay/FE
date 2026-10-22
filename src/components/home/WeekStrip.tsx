@@ -1,7 +1,8 @@
-import { Image, ScrollView, Text, View } from 'react-native'
+import { Image, Pressable, ScrollView, Text, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 
 import type { DayRecord } from '@/features/home/api'
+import type { MissionRecord } from '@/features/record/types'
 import { cn } from '@/lib/cn'
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -12,7 +13,14 @@ const TILE_HEIGHT = 120
 const formatDay = (d: Date) => `${MONTHS[d.getMonth()]} ${d.getDate()}`
 
 /** Figma: Component 8. 이번 주 월~일 기록 사진 띠. 기록 없는 날은 빈 칸. */
-export function WeekStrip({ week }: { week: DayRecord[] }) {
+export function WeekStrip({
+  week,
+  onPressDay,
+}: {
+  week: DayRecord[]
+  /** 기록이 있는 날을 누르면 (그날의 데일리 피드) */
+  onPressDay?: (cover: MissionRecord) => void
+}) {
   const first = week[0]?.date
   const last = week[week.length - 1]?.date
 
@@ -30,8 +38,12 @@ export function WeekStrip({ week }: { week: DayRecord[] }) {
         contentContainerClassName="px-5"
       >
         {week.map((day, i) => (
-          <View
+          <Pressable
             key={day.date.toISOString()}
+            accessibilityRole={day.cover ? 'button' : undefined}
+            accessibilityLabel={`${DAY_LABELS[i]}${day.cover ? ', 기록 있음' : ''}`}
+            disabled={!day.cover || !onPressDay}
+            onPress={() => day.cover && onPressDay?.(day.cover)}
             className={cn(
               'overflow-hidden bg-bg',
               i === 0 && 'rounded-l-2xl',
@@ -39,9 +51,9 @@ export function WeekStrip({ week }: { week: DayRecord[] }) {
             )}
             style={{ width: TILE_WIDTH, height: TILE_HEIGHT }}
           >
-            {day.photo ? (
+            {day.cover ? (
               <Image
-                source={day.photo}
+                source={day.cover.photo}
                 className="absolute inset-0 h-full w-full"
                 resizeMode="cover"
               />
@@ -53,12 +65,12 @@ export function WeekStrip({ week }: { week: DayRecord[] }) {
             <Text
               className={cn(
                 'absolute bottom-[9px] w-full text-center font-en-medium text-en-14',
-                day.photo ? 'text-white' : 'text-ink-faint',
+                day.cover ? 'text-white' : 'text-ink-faint',
               )}
             >
               {DAY_LABELS[i]}
             </Text>
-          </View>
+          </Pressable>
         ))}
       </ScrollView>
     </View>

@@ -59,8 +59,8 @@ export default function HomeScreen() {
         ) : (
           <>
             <View className="mt-4">
-              {/* TODO: Figma 주석 - 주별 사진·지난 낭만들 사진을 누르면 그날의 데일리 피드로 이동 (데일리 피드 화면 작업 시 연결) */}
-              <WeekStrip week={data.week} />
+              {/* Figma 주석: 주별 사진·지난 낭만들 사진을 누르면 그날의 데일리 피드로 이동 */}
+              <WeekStrip week={data.week} onPressDay={(r) => router.push(`/feed/${r.date}`)} />
             </View>
 
             <View className="mt-5 px-5">
@@ -78,7 +78,11 @@ export default function HomeScreen() {
               contentContainerClassName="gap-2 px-5"
             >
               {data.pastRecords.map((record) => (
-                <PastRecordCard key={record.id} record={record} />
+                <PastRecordCard
+                  key={record.id}
+                  record={record}
+                  onPress={() => router.push(`/feed/${record.date}`)}
+                />
               ))}
             </ScrollView>
           </>

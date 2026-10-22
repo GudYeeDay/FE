@@ -1,37 +1,21 @@
-import type { ImageSourcePropType } from 'react-native'
 import { useQuery } from '@tanstack/react-query'
+
+import { toISODate } from '@/lib/date'
+import { coverRecords, getRecordState } from '@/features/record/store'
+import type { MissionRecord } from '@/features/record/types'
 
 export type DayRecord = {
   date: Date
-  photo?: ImageSourcePropType
-}
-
-export type PastRecord = {
-  id: string
-  title: string
-  body: string
-  date: string
-  place: string
-  photo: ImageSourcePropType
+  /** 그날의 대표 기록. 기록이 없는 날은 없음 */
+  cover?: MissionRecord
 }
 
 export type HomeSummary = {
   nickname: string
   recordDays: number
   week: DayRecord[]
-  pastRecords: PastRecord[]
+  pastRecords: MissionRecord[]
 }
-
-// TODO: 홈 요약 API 연동 후 아래 목업 삭제
-const MOCK_PHOTOS = [
-  require('../../../assets/mock/day-1.jpg'),
-  require('../../../assets/mock/day-2.jpg'),
-  require('../../../assets/mock/day-3.jpg'),
-  require('../../../assets/mock/day-4.jpg'),
-  require('../../../assets/mock/day-5.jpg'),
-  require('../../../assets/mock/day-6.jpg'),
-  require('../../../assets/mock/day-7.jpg'),
-]
 
 /** 오늘이 속한 주의 월요일 */
 export function startOfWeek(today: Date) {
@@ -41,28 +25,23 @@ export function startOfWeek(today: Date) {
   return d
 }
 
+// TODO: 홈 요약 API 연동. 지금은 기록 스토어(목업)에서 만든다
 async function fetchHomeSummary(): Promise<HomeSummary> {
   await new Promise((r) => setTimeout(r, 200))
+  const covers = coverRecords(getRecordState())
+  const coverByDate = new Map(covers.map((r) => [r.date, r]))
+
   const monday = startOfWeek(new Date())
   const week = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(monday)
     date.setDate(monday.getDate() + i)
-    return { date, photo: MOCK_PHOTOS[i] }
+    return { date, cover: coverByDate.get(toISODate(date)) }
   })
 
   // Figma 개발 주석: 지난 낭만들은 "랜덤으로 5개"
-  const pastRecords = [3, 4, 1, 5, 0]
-    .sort(() => Math.random() - 0.5)
-    .map((photoIndex, i) => ({
-      id: `r${i}`,
-      title: '퇴근길 한 정거장 걸어보기',
-      body: '한 정거장 일찍 내려서 걸었다. 노을이 다 지기 전에 집에 도착해서 다행이었다.',
-      date: '2026.09.14',
-      place: '퇴근길 버스정류장',
-      photo: MOCK_PHOTOS[photoIndex],
-    }))
+  const pastRecords = [...getRecordState().records].sort(() => Math.random() - 0.5).slice(0, 5)
 
-  return { nickname: 'Pawket', recordDays: 12, week, pastRecords }
+  return { nickname: 'Pawket', recordDays: covers.length, week, pastRecords }
 }
 
 export function useHomeSummary() {

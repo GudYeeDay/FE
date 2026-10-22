@@ -55,8 +55,10 @@ function RootNavigator() {
       <Stack.Protected guard={isSignedIn}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="mission/new" />
-        <Stack.Screen name="mission/active" />
         <Stack.Screen name="archive/[id]" />
+        <Stack.Screen name="record/new" />
+        <Stack.Screen name="record/share" />
+        <Stack.Screen name="feed/[date]" />
         <Stack.Screen name="notifications/index" />
         <Stack.Screen name="notifications/[id]" />
       </Stack.Protected>

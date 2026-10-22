@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react'
 
+import { todayISO } from '@/lib/date'
+
 import type { ArchiveItem, Mission } from './types'
 
 /**
@@ -63,8 +65,6 @@ export function useMissionStore<T>(selector: (s: State) => T): T {
   return useSyncExternalStore(subscribe, () => selector(state))
 }
 
-const today = () => new Date().toISOString().slice(0, 10)
-
 export const missionActions = {
   /** 이미 진행 중인 미션이 있으면 false (한 번에 하나만 진행 가능) */
   start(mission: Mission) {
@@ -75,18 +75,35 @@ export const missionActions = {
   quit() {
     setState({ active: null })
   },
+  /** 기록을 남기면 진행 중 미션이 끝나고, 보관함에는 완료한 미션으로 남는다 */
+  complete() {
+    const mission = state.active
+    if (!mission) return
+    const doneAt = todayISO()
+    const saved = state.archive.some((a) => a.mission.id === mission.id && a.status === 'saved')
+    setState({
+      active: null,
+      archive: saved
+        ? state.archive.map((a) =>
+            a.mission.id === mission.id && a.status === 'saved'
+              ? { ...a, mission, status: 'done', doneAt }
+              : a,
+          )
+        : [...state.archive, { mission, status: 'done', savedAt: doneAt, doneAt }],
+    })
+  },
   /** 추천 카드 북마크: 저장 안 된 미션이면 보관함에 넣고, 저장된 미션이면 뺀다 */
   toggleSaved(mission: Mission) {
     const exists = state.archive.some((a) => a.mission.id === mission.id && a.status === 'saved')
     setState({
       archive: exists
         ? state.archive.filter((a) => !(a.mission.id === mission.id && a.status === 'saved'))
-        : [...state.archive, { mission, status: 'saved', savedAt: today() }],
+        : [...state.archive, { mission, status: 'saved', savedAt: todayISO() }],
     })
   },
   addCustom(input: { title: string; description: string }) {
     const mission = { id: `c-${Date.now()}`, ...input }
-    setState({ archive: [...state.archive, { mission, status: 'saved', savedAt: today() }] })
+    setState({ archive: [...state.archive, { mission, status: 'saved', savedAt: todayISO() }] })
     return mission
   },
   update(id: string, input: { title: string; description: string }) {

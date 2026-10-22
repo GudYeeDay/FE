@@ -9,13 +9,15 @@ type Props = {
   children: ReactNode
   /** 화면 하단에 고정되는 영역 (CTA 버튼 등) */
   footer?: ReactNode
+  /** 스크롤 영역 여백을 바꿀 때 지정 (기본값 'px-5 pt-6 pb-8'을 대신한다) */
+  contentClassName?: string
 }
 
 /**
  * 헤더 + 스크롤되는 입력 폼 + 하단 고정 버튼.
  * Figma 기준: 폼 좌우 20, 첫 입력칸은 헤더 아래 24, 하단 버튼 좌우 30·아래 36.
  */
-export function FormScreen({ title, children, footer }: Props) {
+export function FormScreen({ title, children, footer, contentClassName }: Props) {
   const { bottom } = useSafeAreaInsets()
 
   return (
@@ -27,7 +29,7 @@ export function FormScreen({ title, children, footer }: Props) {
       >
         <ScrollView
           className="flex-1"
-          contentContainerClassName="px-5 pt-6 pb-8"
+          contentContainerClassName={contentClassName ?? 'px-5 pt-6 pb-8'}
           keyboardShouldPersistTaps="handled"
         >
           {children}
