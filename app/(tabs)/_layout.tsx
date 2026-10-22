@@ -14,6 +14,8 @@ export default function TabsLayout() {
     <>
       <Tabs
         screenOptions={{ headerShown: false }}
+        // 진행중 미션처럼 숨은 탭에서 뒤로 가면 직전 탭으로 돌아가게 한다
+        backBehavior="history"
         tabBar={(props) => (
           <BottomTabBar
             {...props}
@@ -29,6 +31,8 @@ export default function TabsLayout() {
         <Tabs.Screen name="calendar" options={{ title: '캘린더' }} />
         <Tabs.Screen name="archive" options={{ title: '보관함' }} />
         <Tabs.Screen name="my" options={{ title: '마이페이지' }} />
+        {/* 탭 아이콘은 없지만 탭바는 보이는 화면 */}
+        <Tabs.Screen name="mission/active" options={{ href: null }} />
       </Tabs>
       <MissionRecommendModal visible={recommendOpen} onClose={() => setRecommendOpen(false)} />
     </>
