@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
 
 import { MonthGrid } from '@/components/calendar/MonthGrid'
 import { useCalendar } from '@/features/calendar/api'
@@ -8,6 +9,7 @@ import { colors } from '@/theme'
 
 /** Figma: 캘린더. 첫 기록이 있는 달부터 이번 달까지 이어서 보여주고, 처음엔 이번 달이 보이게 맨 아래로 내린다. */
 export default function CalendarScreen() {
+  const router = useRouter()
   const { data, isPending } = useCalendar()
   const scrollRef = useRef<ScrollView>(null)
 
@@ -41,7 +43,7 @@ export default function CalendarScreen() {
               month={month}
               showYear={i === 0 || month === 1}
               recordsByDate={recordsByDate}
-              // TODO: 날짜를 누르면 그날의 기록(데일리 피드) 화면으로 이동
+              onPressDay={(record) => router.push(`/feed/${record.date}`)}
             />
           ))}
         </ScrollView>

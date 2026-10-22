@@ -1,7 +1,7 @@
 import { Image, Pressable, Text, View, useWindowDimensions } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 
-import type { CalendarRecord } from '@/features/calendar/api'
+import type { MissionRecord } from '@/features/record/types'
 import { cn } from '@/lib/cn'
 
 const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일']
@@ -30,8 +30,8 @@ type Props = {
   /** 해의 첫 달이거나 목록의 첫 달이면 "2026 • September" 처럼 연도를 붙인다 */
   showYear: boolean
   /** 'YYYY-MM-DD' → 기록 */
-  recordsByDate: Map<string, CalendarRecord>
-  onPressDay?: (record: CalendarRecord) => void
+  recordsByDate: Map<string, MissionRecord>
+  onPressDay?: (record: MissionRecord) => void
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
