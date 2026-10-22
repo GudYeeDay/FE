@@ -4,7 +4,7 @@ import { Pressable, Text } from 'react-native'
 export function TextLink({ children, onPress }: { children: string; onPress: () => void }) {
   return (
     <Pressable accessibilityRole="link" hitSlop={8} onPress={onPress}>
-      <Text className="font-en text-en-14 text-ink underline">{children}</Text>
+      <Text className="font-en text-en-14 text-ink-soft underline">{children}</Text>
     </Pressable>
   )
 }

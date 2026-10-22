@@ -31,7 +31,7 @@ export default function TermsScreen() {
 
   return (
     <FormScreen
-      title="약관동의"
+      title="약관 동의"
       footer={
         <Button
           disabled={!requiredAgreed}
@@ -42,29 +42,24 @@ export default function TermsScreen() {
         </Button>
       }
     >
-      <View className="px-0.5">
+      <View className="-mt-2">
         <Text className="font-en-medium text-en-16 text-ink">
           서비스 이용을 위해 약관에 동의해주세요.
         </Text>
 
-        <Checkbox
-          className="mt-[26px]"
-          checked={allAgreed}
-          onChange={setAll}
-          label="전체 동의합니다."
-        />
-        <Text className="mt-2.5 pl-[3px] font-ko text-ko-12 text-ink-soft">
+        <Checkbox className="mt-6" checked={allAgreed} onChange={setAll} label="전체 동의합니다." />
+        <Text className="mt-2 font-ko text-ko-12 text-ink-soft">
           서비스 이용약관, 개인정보 수집·이용, 선택적 마케팅 정보 수신에 모두 동의합니다.
         </Text>
 
-        <View className="mt-[26px] gap-[9px]">
+        <View className="mt-10 gap-6">
           {TERMS.map((term) => (
             <View
               key={term.key}
               className={
                 term.required
                   ? 'flex-row items-center justify-between'
-                  : 'mt-[15px] flex-row items-center justify-between'
+                  : 'mt-6 flex-row items-center justify-between'
               }
             >
               <Checkbox

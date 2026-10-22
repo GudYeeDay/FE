@@ -36,10 +36,10 @@ export default function FindPasswordScreen() {
         </Button>
       }
     >
-      <EmailVerificationFields verification={verification} gapClassName="mt-4" />
+      <EmailVerificationFields verification={verification} />
 
       <TextField
-        className="mt-9"
+        className="mt-12"
         label="새 비밀번호"
         placeholder={rules.password.placeholder}
         secure
@@ -50,7 +50,7 @@ export default function FindPasswordScreen() {
         errorMessage={fieldError(password, passwordValid, rules.password.error)}
       />
       <TextField
-        className="mt-4"
+        className="mt-7"
         label="새 비밀번호 확인"
         placeholder={rules.passwordConfirm.placeholder}
         secure

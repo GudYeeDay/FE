@@ -20,7 +20,7 @@ export function FormScreen({ title, children, footer }: Props) {
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
-      <Header title={title} />
+      <Header title={title} align="center" />
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
