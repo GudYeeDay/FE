@@ -10,12 +10,14 @@ import { MissionStarted } from '@/components/mission/MissionStarted'
 import { Dialog } from '@/components/ui/Dialog'
 import { missionActions, useMissionStore } from '@/features/mission/store'
 
-/** Figma: 저장한 미션 상세 */
-export default function SavedMissionScreen() {
+/** Figma: 저장한 미션 상세 / 완료 미션 상세 (?status=done) */
+export default function ArchiveMissionScreen() {
   const router = useRouter()
-  const { id } = useLocalSearchParams<{ id: string }>()
+  const { id, status = 'saved' } = useLocalSearchParams<{ id: string; status?: 'saved' | 'done' }>()
   const archive = useMissionStore((s) => s.archive)
-  const item = archive.find((a) => a.mission.id === id && a.status === 'saved')
+  const item = archive.find((a) => a.mission.id === id && a.status === status)
+  const done = status === 'done'
+  const title = done ? '완료 미션' : '저장한 미션'
 
   const [started, setStarted] = useState(false)
   const [blocked, setBlocked] = useState(false)
@@ -36,7 +38,7 @@ export default function SavedMissionScreen() {
   if (!item) {
     return (
       <SafeAreaView className="flex-1 bg-white">
-        <Header title="저장한 미션" />
+        <Header title={title} align="center" />
         <View className="flex-1 items-center justify-center">
           <Text className="font-ko text-ko-14 text-ink-soft">미션을 찾을 수 없어요</Text>
         </View>
@@ -44,43 +46,46 @@ export default function SavedMissionScreen() {
     )
   }
 
-  const [, m, d] = item.savedAt.split('-').map(Number)
+  const [, m, d] = ((done && item.doneAt) || item.savedAt).split('-').map(Number)
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Header title="저장한 미션" />
-      <View className="flex-1 px-[21px] pt-4">
+      <Header title={title} align="center" />
+      <View className="flex-1 px-5 pt-4">
         <View className="flex-row items-center gap-3 rounded-lg border border-line px-4 py-2.5">
           <TitleBarIcon width={2} height={14} />
           <Text className="font-en text-en-14 text-ink-soft">
-            {m}. {d}에 저장함
+            {m}. {d}에 {done ? '완료함' : '저장함'}
           </Text>
         </View>
-        <Text className="mt-6 font-ko-bold text-ko-20 text-[#0D0D0D]">{item.mission.title}</Text>
+        <Text className="mt-[26px] font-ko-bold text-ko-20 text-ink">{item.mission.title}</Text>
         <Text className="mt-2 font-en text-en-14 leading-[17px] text-[#AFAFAF]">
           {item.mission.description}
         </Text>
       </View>
 
-      <View className="items-center px-[30px] pb-4">
-        <Button
-          onPress={() => {
-            // TODO: 미션 시작 API 연동
-            if (missionActions.start(item.mission)) setStarted(true)
-            else setBlocked(true)
-          }}
-        >
-          이 미션으로 시작하기
-        </Button>
-        <Pressable
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={() => setConfirmDelete(true)}
-          className="mt-[21px]"
-        >
-          <Text className="font-ko-medium text-ko-14 text-ink-faint">보관함에서 삭제하기</Text>
-        </Pressable>
-      </View>
+      {/* 완료한 미션은 다시 시작하거나 여기서 지울 수 없다 (Figma 완료 미션 상세에는 버튼이 없음) */}
+      {done ? null : (
+        <View className="items-center px-[30px] pb-4">
+          <Button
+            onPress={() => {
+              // TODO: 미션 시작 API 연동
+              if (missionActions.start(item.mission)) setStarted(true)
+              else setBlocked(true)
+            }}
+          >
+            이 미션으로 시작하기
+          </Button>
+          <Pressable
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={() => setConfirmDelete(true)}
+            className="mt-[21px]"
+          >
+            <Text className="font-ko-medium text-ko-14 text-ink-faint">보관함에서 삭제하기</Text>
+          </Pressable>
+        </View>
+      )}
 
       <Modal
         visible={blocked}
