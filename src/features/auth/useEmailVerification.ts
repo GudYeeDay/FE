@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useCountdown } from '@/hooks/useCountdown'
 import { rules } from './validation'
 
-const CODE_TTL_SECONDS = 180
+const CODE_TTL_SECONDS = 300
 
 /** 이메일 입력 → 인증요청 → 4자리 인증번호 입력 흐름의 상태 */
 export function useEmailVerification() {

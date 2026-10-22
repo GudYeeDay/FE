@@ -65,7 +65,7 @@ export default function SignupScreen() {
 
       <TextField
         className="mt-12"
-        label="닉네임"
+        label="이름"
         placeholder={rules.nickname.placeholder}
         maxLength={10}
         value={nickname}
