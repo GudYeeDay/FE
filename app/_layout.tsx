@@ -57,6 +57,8 @@ function RootNavigator() {
         <Stack.Screen name="mission/new" />
         <Stack.Screen name="mission/active" />
         <Stack.Screen name="archive/[id]" />
+        <Stack.Screen name="notifications/index" />
+        <Stack.Screen name="notifications/[id]" />
       </Stack.Protected>
       <Stack.Protected guard={!isSignedIn}>
         <Stack.Screen name="(auth)" />
