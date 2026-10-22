@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { MOCK_MISSIONS } from './mocks'
 import type { Mission } from './types'
 
-const RECOMMEND_COUNT = 5
+const RECOMMEND_COUNT = 3
 
 /**
  * 추천 미션 목록. "다른 미션 보기" 를 누르면 refetch 해서 새 목록을 받는다.

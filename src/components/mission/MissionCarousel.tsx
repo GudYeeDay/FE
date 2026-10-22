@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useWindowDimensions, View } from 'react-native'
 import Animated, {
   Extrapolation,
@@ -26,22 +26,26 @@ type Props = {
   savedIds: ReadonlySet<string>
   onToggleSaved: (mission: Mission) => void
   onStart: (mission: Mission) => void
+  /** 처음 가운데에 올 카드 (펼침 화면에서 탭한 카드) */
+  initialIndex?: number
 }
 
 /** 미션 카드를 좌우로 넘기는 캐러셀. 가운데 카드가 크고 양옆은 작게 기울어진다. */
-export function MissionCarousel({ missions, savedIds, onToggleSaved, onStart }: Props) {
+export function MissionCarousel({
+  missions,
+  savedIds,
+  onToggleSaved,
+  onStart,
+  initialIndex = 0,
+}: Props) {
   const { width } = useWindowDimensions()
-  const scrollX = useSharedValue(0)
+  const initialOffset = initialIndex * ITEM_INTERVAL
+  const scrollX = useSharedValue(initialOffset)
   const listRef = useRef<Animated.ScrollView>(null)
 
   const onScroll = useAnimatedScrollHandler((e) => {
     scrollX.value = e.contentOffset.x
   })
-
-  // 새 추천 목록을 받으면 첫 카드로 돌아간다
-  useEffect(() => {
-    listRef.current?.scrollTo({ x: 0, animated: false })
-  }, [missions])
 
   const sidePadding = (width - ITEM_INTERVAL) / 2
 
@@ -53,6 +57,7 @@ export function MissionCarousel({ missions, savedIds, onToggleSaved, onStart }: 
       snapToInterval={ITEM_INTERVAL}
       decelerationRate="fast"
       onScroll={onScroll}
+      contentOffset={{ x: initialOffset, y: 0 }}
       scrollEventThrottle={16}
       style={{ height: CAROUSEL_HEIGHT, flexGrow: 0 }}
       contentContainerStyle={{ paddingHorizontal: sidePadding, alignItems: 'flex-start' }}

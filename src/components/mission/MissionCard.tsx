@@ -57,7 +57,7 @@ export function MissionCard({ mission, saved, onToggleSaved, onStart, variant = 
           className="absolute right-4 top-6"
         >
           {saved ? (
-            <BookmarkFilledIcon width={24} height={24} color={colors.main.DEFAULT} />
+            <BookmarkFilledIcon width={24} height={24} color={colors.ink.DEFAULT} />
           ) : (
             <BookmarkIcon width={24} height={24} color={colors.ink.DEFAULT} />
           )}
