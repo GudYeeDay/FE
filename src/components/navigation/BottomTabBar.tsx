@@ -1,5 +1,14 @@
-import type { FC } from 'react'
+import { useEffect, type FC } from 'react'
 import { Pressable, View, useWindowDimensions } from 'react-native'
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated'
 import Svg, {
   Defs,
   FeBlend,
@@ -16,6 +25,7 @@ import type { BottomTabBarProps } from 'expo-router/tabs'
 import type { SvgProps } from 'react-native-svg'
 
 import {
+  LoadingIcon,
   PlusIcon,
   TabArchiveIcon,
   TabCalendarIcon,
@@ -38,8 +48,15 @@ const TAB_ICONS: Record<string, FC<SvgProps>> = {
   my: TabMyIcon,
 }
 
+/**
+ * 가운데 버튼 상태 (Figma TabBar 의 미션추가 / 진행중 variant)
+ * - add: 진한 빨강 + 아이콘. 누르면 미션 추천
+ * - inProgress: 밝은 빨강 + 도는 로딩 아이콘. 진행 중인 미션이 있을 때
+ */
+export type CenterButtonState = 'add' | 'inProgress'
+
 type Props = BottomTabBarProps & {
-  /** 가운데 + 버튼 */
+  centerState?: CenterButtonState
   onPressCenter: () => void
 }
 
@@ -47,7 +64,13 @@ type Props = BottomTabBarProps & {
  * Figma: Group 10 / TabBar(미션추가-홈)
  * 5칸: 홈 · 캘린더 · (+) · 보관함 · 마이. 가운데가 파인 곡선 배경은 화면 폭에 맞춰 Path 로 그린다.
  */
-export function BottomTabBar({ state, descriptors, navigation, onPressCenter }: Props) {
+export function BottomTabBar({
+  state,
+  descriptors,
+  navigation,
+  centerState = 'add',
+  onPressCenter,
+}: Props) {
   const { width } = useWindowDimensions()
   const { bottom } = useSafeAreaInsets()
 
@@ -89,17 +112,43 @@ export function BottomTabBar({ state, descriptors, navigation, onPressCenter }: 
         <View className="flex-1 items-center">
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="미션 추가"
+            accessibilityLabel={centerState === 'inProgress' ? '진행중인 미션 보기' : '미션 추가'}
             onPress={onPressCenter}
-            className="items-center justify-center rounded-full bg-main active:opacity-80"
+            className={`items-center justify-center rounded-full active:opacity-80 ${
+              centerState === 'inProgress' ? 'bg-main-soft' : 'bg-main'
+            }`}
             style={{ width: PLUS_SIZE, height: PLUS_SIZE }}
           >
-            <PlusIcon width={21.33} height={21.33} color={colors.bg} />
+            {centerState === 'inProgress' ? (
+              <SpinningLoadingIcon />
+            ) : (
+              <PlusIcon width={21.33} height={21.33} color={colors.bg} />
+            )}
           </Pressable>
         </View>
         {right.map(renderTab)}
       </View>
     </View>
+  )
+}
+
+/** Figma hugeicons:loading-03. 천천히 돈다. 시스템 '동작 줄이기'가 켜져 있으면 멈춰 있다. */
+function SpinningLoadingIcon() {
+  const reduceMotion = useReducedMotion()
+  const rotation = useSharedValue(0)
+
+  useEffect(() => {
+    if (reduceMotion) return
+    rotation.value = withRepeat(withTiming(360, { duration: 1600, easing: Easing.linear }), -1)
+    return () => cancelAnimation(rotation)
+  }, [reduceMotion, rotation])
+
+  const style = useAnimatedStyle(() => ({ transform: [{ rotate: `${rotation.value}deg` }] }))
+
+  return (
+    <Animated.View style={style}>
+      <LoadingIcon width={28} height={28} color={colors.white} />
+    </Animated.View>
   )
 }
 

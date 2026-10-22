@@ -22,3 +22,4 @@ export { default as MoreVerticalIcon } from '../../assets/icons/more-vertical.sv
 export { default as PlusLineIcon } from '../../assets/icons/plus-line.svg'
 export { default as PenIcon } from '../../assets/icons/pen.svg'
 export { default as TrashIcon } from '../../assets/icons/trash.svg'
+export { default as LoadingIcon } from '../../assets/icons/loading.svg'
