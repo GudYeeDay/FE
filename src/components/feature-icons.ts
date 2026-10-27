@@ -1,0 +1,7 @@
+export { default as ArchiveEmptyIcon } from '../../assets/icons/archive-empty.svg'
+export { default as MoreVerticalIcon } from '../../assets/icons/more-vertical.svg'
+export { default as MoreHorizontalIcon } from '../../assets/icons/more-horizontal.svg'
+export { default as CloseIcon } from '../../assets/icons/close.svg'
+export { default as DownloadIcon } from '../../assets/icons/download.svg'
+export { default as PencilIcon } from '../../assets/icons/pencil.svg'
+export { default as TrashIcon } from '../../assets/icons/trash.svg'
