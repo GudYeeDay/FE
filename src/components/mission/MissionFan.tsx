@@ -17,6 +17,12 @@ const FAN_SCALE = 160 / 192
 /** 부채꼴 배치 (Figma 미션 추천 첫 화면): 가운데에서 ±129, 양옆 ±8도 */
 const FAN_OFFSET_X = 129
 const FAN_ROTATE_DEG = 8
+/**
+ * 양옆 카드를 내리는 거리. 기울이면 안쪽 윗모서리가 위로 올라가 가운데 카드가 내려앉아
+ * 보였다. 안쪽 모서리가 가운데 카드 윗변과 비슷한 높이가 되도록 내려, 가운데 카드가 가장
+ * 위에 오게 한다 (시안 기준 바깥 아랫모서리는 가운데보다 약 25pt 아래).
+ */
+const FAN_SIDE_OFFSET_Y = 13
 /** 한 장씩 들어오는 간격과 시간 */
 const DEAL_STAGGER_MS = 160
 const DEAL_DURATION_MS = 420
@@ -76,6 +82,7 @@ function FanCard({
   const reduceMotion = useReducedMotion()
   const position = index - (count - 1) / 2 // -1, 0, 1
   const targetX = position * FAN_OFFSET_X
+  const targetY = Math.abs(position) * FAN_SIDE_OFFSET_Y
   const targetRotate = position * FAN_ROTATE_DEG
 
   // 0 → 1 로 진행하면서 왼쪽 화면 밖에서 제자리로 온다
@@ -96,6 +103,7 @@ function FanCard({
       opacity: p === 0 ? 0 : 1,
       transform: [
         { translateX: startX + (targetX - startX) * p },
+        { translateY: targetY * p },
         { rotate: `${-20 + (targetRotate + 20) * p}deg` },
         { scale: FAN_SCALE },
       ],
