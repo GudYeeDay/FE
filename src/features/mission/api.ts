@@ -9,9 +9,18 @@ const RECOMMEND_COUNT = 3
  * 추천 미션 목록. "다른 미션 보기" 를 누르면 refetch 해서 새 목록을 받는다.
  * TODO: 실제 API 로 교체 (apiFetch('/missions/recommended'))
  */
+/** 직전에 보여준 추천. "다른 미션 보기" 에서 같은 카드가 다시 나오지 않게 뺀다 (목업 전용) */
+let lastShownIds = new Set<string>()
+
 async function fetchRecommendedMissions(): Promise<Mission[]> {
   await new Promise((r) => setTimeout(r, 300))
-  return [...MOCK_MISSIONS].sort(() => Math.random() - 0.5).slice(0, RECOMMEND_COUNT)
+  const shuffle = (list: Mission[]) => [...list].sort(() => Math.random() - 0.5)
+  const fresh = shuffle(MOCK_MISSIONS.filter((m) => !lastShownIds.has(m.id)))
+  // 새 카드가 모자라면 직전 카드로 채운다
+  const refill = shuffle(MOCK_MISSIONS.filter((m) => lastShownIds.has(m.id)))
+  const picked = [...fresh, ...refill].slice(0, RECOMMEND_COUNT)
+  lastShownIds = new Set(picked.map((m) => m.id))
+  return picked
 }
 
 export function useRecommendedMissions(enabled: boolean) {
