@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { BookmarkFilledIcon, RefreshIcon } from '@/components/icons'
 import { Dialog } from '@/components/ui/Dialog'
@@ -104,7 +105,16 @@ export function MissionRecommendModal({ visible, onClose }: Props) {
       statusBarTranslucent
       onRequestClose={close}
     >
-      <View className="flex-1 items-center justify-center" style={{ backgroundColor: DIM_COLOR }}>
+      {/* Modal 은 앱 루트 밖에 그려져서, 캐러셀 제스처가 동작하려면 루트를 한 번 더 둬야 한다 */}
+      <GestureHandlerRootView
+        // 서드파티 컴포넌트라 NativeWind className 이 적용되지 않아 style 로 준다
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: DIM_COLOR,
+        }}
+      >
         {/* 카드 바깥을 누르면 닫힘 */}
         <Pressable
           accessibilityLabel="닫기"
@@ -179,7 +189,7 @@ export function MissionRecommendModal({ visible, onClose }: Props) {
           icon={<BookmarkFilledIcon width={24} height={24} color={colors.ink.DEFAULT} />}
           onHide={hideToast}
         />
-      </View>
+      </GestureHandlerRootView>
     </Modal>
   )
 }

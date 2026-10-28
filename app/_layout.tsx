@@ -10,6 +10,7 @@ import {
   NotoSansKR_700Bold,
 } from '@expo-google-fonts/noto-sans-kr'
 import { QueryClientProvider } from '@tanstack/react-query'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { SessionProvider, useSession } from '@/features/auth/session'
 import { queryClient } from '@/lib/query-client'
@@ -37,12 +38,14 @@ export default function RootLayout() {
   if (!fontsLoaded && !fontError) return null
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <StatusBar style="dark" />
-        <RootNavigator />
-      </SessionProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+          <StatusBar style="dark" />
+          <RootNavigator />
+        </SessionProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   )
 }
 
