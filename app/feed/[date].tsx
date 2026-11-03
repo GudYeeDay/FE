@@ -7,7 +7,7 @@ import { Header } from '@/components'
 import { FeedItem, type AnchorRect } from '@/components/record/FeedItem'
 import { FeedMenu } from '@/components/record/FeedMenu'
 import { Dialog } from '@/components/ui/Dialog'
-import { useHomeSummary } from '@/features/home/api'
+import { useMyProfile } from '@/features/my/store'
 import { coverIdOn, recordActions, recordsOn, useRecordStore } from '@/features/record/store'
 import type { MissionRecord } from '@/features/record/types'
 
@@ -21,7 +21,7 @@ export default function DailyFeedScreen() {
   const { date, from } = useLocalSearchParams<{ date: string; from?: 'record' }>()
   const records = useRecordStore((s) => s.records)
   const covers = useRecordStore((s) => s.covers)
-  const nickname = useHomeSummary().data?.nickname ?? ''
+  const nickname = useMyProfile().name
 
   const dayRecords = useMemo(() => recordsOn(records, date), [records, date])
   const coverId = coverIdOn({ records, covers }, date)

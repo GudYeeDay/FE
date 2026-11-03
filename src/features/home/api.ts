@@ -11,7 +11,6 @@ export type DayRecord = {
 }
 
 export type HomeSummary = {
-  nickname: string
   recordDays: number
   week: DayRecord[]
   pastRecords: MissionRecord[]
@@ -41,7 +40,7 @@ async function fetchHomeSummary(): Promise<HomeSummary> {
   // Figma 개발 주석: 지난 낭만들은 "랜덤으로 5개"
   const pastRecords = [...getRecordState().records].sort(() => Math.random() - 0.5).slice(0, 5)
 
-  return { nickname: 'Pawket', recordDays: covers.length, week, pastRecords }
+  return { recordDays: covers.length, week, pastRecords }
 }
 
 export function useHomeSummary() {
