@@ -7,6 +7,7 @@ import { PastRecordCard } from '@/components/home/PastRecordCard'
 import { WeekStrip } from '@/components/home/WeekStrip'
 import { BellIcon } from '@/components/icons'
 import { useHomeSummary } from '@/features/home/api'
+import { useMyProfile } from '@/features/my/store'
 import { useHasNewNotification } from '@/features/notification/store'
 import { useMissionStore } from '@/features/mission/store'
 import { colors } from '@/theme'
@@ -15,6 +16,7 @@ import { colors } from '@/theme'
 export default function HomeScreen() {
   const router = useRouter()
   const { data, isPending } = useHomeSummary()
+  const { name } = useMyProfile()
   const activeMission = useMissionStore((s) => s.active)
   const hasNewNotification = useHasNewNotification()
 
@@ -26,7 +28,7 @@ export default function HomeScreen() {
         <View className="flex-row items-start justify-between px-5 pt-3.5">
           <View>
             <Text className="font-ko text-ko-12 text-ink">
-              {data?.nickname ?? ''} 님의 굳이데이
+              {name} 님의 굳이데이
             </Text>
             <Text className="font-ko-bold text-ko-20 text-ink">낭만을 기록해보세요</Text>
           </View>
