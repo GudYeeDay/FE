@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router'
 import { Button, TextField } from '@/components'
 import { EmailVerificationFields } from '@/components/auth/EmailVerificationFields'
 import { FormScreen } from '@/components/auth/FormScreen'
+import { loginErrorText, usePasswordReset } from '@/features/auth/api'
 import { useEmailVerification } from '@/features/auth/useEmailVerification'
 import { fieldError, rules } from '@/features/auth/validation'
 
@@ -17,15 +18,32 @@ export default function FindPasswordScreen() {
 
   const passwordValid = rules.password.test(password)
   const confirmValid = passwordConfirm === password
+  const reset = usePasswordReset()
   const canSubmit =
-    verification.verified && passwordValid && passwordConfirm.length > 0 && confirmValid
+    verification.verified &&
+    passwordValid &&
+    passwordConfirm.length > 0 &&
+    confirmValid &&
+    !reset.isPending
 
-  const submit = () => {
-    // TODO: 비밀번호 변경 API 연동
-    Alert.alert('비밀번호 변경 완료', '새 비밀번호로 로그인해주세요.', [
-      { text: '확인', onPress: () => router.back() },
-    ])
-  }
+  // 서버가 인증번호를 한 번 더 확인하므로 확인에 쓴 번호를 같이 보낸다
+  const submit = () =>
+    reset.mutate(
+      {
+        email: verification.email.trim(),
+        code: verification.code,
+        password,
+        passwordCheck: passwordConfirm,
+      },
+      {
+        onSuccess: () =>
+          Alert.alert('비밀번호 변경 완료', '새 비밀번호로 로그인해주세요.', [
+            { text: '확인', onPress: () => router.back() },
+          ]),
+        onError: (error) =>
+          Alert.alert('비밀번호 변경 실패', loginErrorText(error, '잠시 후 다시 시도해주세요')),
+      },
+    )
 
   return (
     <FormScreen

@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Alert, Pressable, Text, View } from 'react-native'
+import { useRouter } from 'expo-router'
 
 import { Button, Checkbox } from '@/components'
 import { FormScreen } from '@/components/auth/FormScreen'
 import { ChevronRightIcon } from '@/components/icons'
-import { useSession } from '@/features/auth/session'
+import { getPendingSignup, loginErrorText, useSignup } from '@/features/auth/api'
 import { colors } from '@/theme'
 
 const TERMS = [
@@ -17,7 +18,8 @@ type TermKey = (typeof TERMS)[number]['key']
 
 /** Figma: 약관 동의. 필수 약관에 모두 동의해야 시작하기 활성 */
 export default function TermsScreen() {
-  const { signIn } = useSession()
+  const router = useRouter()
+  const signup = useSignup()
   const [agreed, setAgreed] = useState<Record<TermKey, boolean>>({
     service: false,
     privacy: false,
@@ -34,9 +36,18 @@ export default function TermsScreen() {
       title="약관 동의"
       footer={
         <Button
-          disabled={!requiredAgreed}
-          // TODO: 회원가입 API 호출 (가입 정보 + 마케팅 동의 여부) 후 로그인 처리
-          onPress={signIn}
+          disabled={!requiredAgreed || signup.isPending}
+          // TODO: 마케팅 수신 동의 여부를 받는 API 가 없어 아직 보내지 않는다
+          onPress={() => {
+            const pending = getPendingSignup()
+            // 가입 정보 없이 이 화면에 왔으면(앱 재시작 등) 회원가입부터 다시
+            if (!pending) return router.replace('/signup')
+            // 성공하면 토큰이 저장되면서 홈으로 바뀐다
+            signup.mutate(pending, {
+              onError: (error) =>
+                Alert.alert('회원가입 실패', loginErrorText(error, '잠시 후 다시 시도해주세요')),
+            })
+          }}
         >
           시작하기
         </Button>

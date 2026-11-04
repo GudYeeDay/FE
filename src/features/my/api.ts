@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { apiFetch, setAccessToken, useSignedIn } from '@/api/http'
+import { apiFetch, useSignedIn } from '@/api/http'
 import type { ApiResponse, Profile } from '@/api/types'
-import { useSession } from '@/features/auth/session'
 
 export function useMyProfile() {
   const signedIn = useSignedIn()
@@ -37,18 +36,5 @@ export function useChangePassword() {
         method: 'PUT',
         body: JSON.stringify(body),
       }),
-  })
-}
-
-export function useLogout() {
-  const queryClient = useQueryClient()
-  const { signOut } = useSession()
-  return useMutation({
-    mutationFn: () => apiFetch<ApiResponse<null>>('/api/auth/logout', { method: 'POST' }),
-    onSettled: () => {
-      setAccessToken(null)
-      signOut()
-      queryClient.clear()
-    },
   })
 }

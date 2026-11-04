@@ -2,6 +2,9 @@
  * 인증 화면 입력 규칙. 문구는 Figma placeholder/에러 문구 기준.
  * 서버 규칙이 정해지면 여기만 맞추면 된다.
  */
+/** 인증번호 자릿수 (서버 EmailVerificationService 기준) */
+export const CODE_LENGTH = 6
+
 export const rules = {
   email: {
     test: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),
@@ -9,8 +12,9 @@ export const rules = {
     error: '이메일을 다시 확인해주세요',
   },
   code: {
-    test: (v: string) => /^\d{4}$/.test(v),
-    placeholder: '4자리 숫자 입력',
+    // 서버가 영문 대문자·숫자 6자리를 메일로 보낸다 (Figma 시안은 4자리 숫자)
+    test: (v: string) => new RegExp(`^[0-9A-Z]{${CODE_LENGTH}}$`).test(v),
+    placeholder: '6자리 인증번호 입력',
     error: '인증번호를 다시 확인해주세요',
   },
   password: {

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { ApiError, apiFetch, setAccountEmail, setTokens } from '@/api/http'
+import { ApiError, apiFetch, setTokens } from '@/api/http'
 import type {
   ApiResponse,
   AuthSession,
@@ -9,7 +9,9 @@ import type {
 } from '@/api/types'
 
 export function loginErrorText(error: unknown, fallback = '이메일 또는 비밀번호를 확인해 주세요') {
-  if (error instanceof ApiError && error.message && !/^\d+$/.test(error.message)) return error.message
+  if (!(error instanceof ApiError)) return '서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요'
+  // 서버 메시지가 없으면 상태 코드만 들어 있다
+  if (error.message && !/^\d+$/.test(error.message)) return error.message
   return fallback
 }
 
@@ -60,7 +62,6 @@ export function useLogin() {
       const session = res.result
       if (!session?.accessToken) throw new ApiError(200, '로그인에 실패했어요')
       setTokens(session.accessToken, session.refreshToken ?? null)
-      if (session.email) setAccountEmail(session.email)
       return session
     },
     onSuccess: () => {
@@ -80,10 +81,10 @@ export function useSignup() {
       })
       const session = res.result
       if (session?.accessToken) setTokens(session.accessToken, session.refreshToken ?? null)
-      if (session?.email) setAccountEmail(session.email)
       return session
     },
     onSuccess: () => {
+      pendingSignup = null
       queryClient.clear()
     },
   })
