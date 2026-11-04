@@ -72,10 +72,8 @@ export function AccountDialog({ action, onCancel, onDone }: Props) {
             cancelLabel="취소"
             confirmLabel={copy.confirmLabel}
             onCancel={onCancel}
-            onConfirm={() => {
-              // TODO: 로그아웃/회원탈퇴 API 연동
-              setConfirmed(action)
-            }}
+            // 실제 로그아웃은 완료 안내가 닫힌 뒤 onDone 에서 한다 (회원탈퇴는 API 가 없어 아직 막아 둠)
+            onConfirm={() => setConfirmed(action)}
           />
         ) : null}
         {copy && done ? (

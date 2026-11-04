@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { Modal, Pressable, Text, View } from 'react-native'
+import { ActivityIndicator, Alert, Modal, Pressable, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 
 import { Button, Header } from '@/components'
 import { Dialog } from '@/components/ui/Dialog'
-import { missionActions, useMissionStore } from '@/features/mission/store'
+import { errorText } from '@/api/http'
+import { useActiveMission, useQuitMission } from '@/features/mission/api'
+import { colors } from '@/theme'
 
 /**
  * Figma: 진행중 미션 상세 / 그만두기 확인.
@@ -13,7 +15,8 @@ import { missionActions, useMissionStore } from '@/features/mission/store'
  */
 export default function ActiveMissionScreen() {
   const router = useRouter()
-  const active = useMissionStore((s) => s.active)
+  const { data: active, isPending } = useActiveMission()
+  const quit = useQuitMission()
   const [confirmQuit, setConfirmQuit] = useState(false)
 
   return (
@@ -38,6 +41,10 @@ export default function ActiveMissionScreen() {
             </Pressable>
           </View>
         </>
+      ) : isPending ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color={colors.ink.faint} />
+        </View>
       ) : (
         <View className="flex-1 items-center justify-center">
           <Text className="font-ko text-ko-14 text-ink-soft">진행중인 미션이 없어요</Text>
@@ -63,10 +70,17 @@ export default function ActiveMissionScreen() {
             confirmLabel="그만두기"
             onCancel={() => setConfirmQuit(false)}
             onConfirm={() => {
-              // TODO: 미션 그만두기 API 연동
-              setConfirmQuit(false)
-              missionActions.quit()
-              router.navigate('/')
+              if (quit.isPending) return
+              quit.mutate(undefined, {
+                onSuccess: () => {
+                  setConfirmQuit(false)
+                  router.navigate('/')
+                },
+                onError: (error) => {
+                  setConfirmQuit(false)
+                  Alert.alert('미션을 그만두지 못했어요', errorText(error))
+                },
+              })
             }}
           />
         </View>

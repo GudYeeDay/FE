@@ -8,7 +8,7 @@ import * as MediaLibrary from 'expo-media-library'
 
 import { Button, Header } from '@/components'
 import { CheckCircleLargeIcon } from '@/components/icons'
-import { useRecordStore } from '@/features/record/store'
+import { useRecord } from '@/features/record/api'
 import { formatDotDate } from '@/lib/date'
 import { colors } from '@/theme'
 
@@ -20,8 +20,8 @@ const DONE_MARK_MS = 3000
  * 기록 카드(사진 + 제목 + 본문 + 날짜·장소)를 그대로 캡처해서 사진 보관함에 저장한다.
  */
 export default function ShareRecordScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
-  const record = useRecordStore((s) => s.records.find((r) => r.id === id))
+  const { id, date } = useLocalSearchParams<{ id: string; date: string }>()
+  const { data: record } = useRecord(date, Number(id))
   const { bottom } = useSafeAreaInsets()
   const cardRef = useRef<View>(null)
 

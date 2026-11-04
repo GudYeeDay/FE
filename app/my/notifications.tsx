@@ -1,7 +1,7 @@
 import { Switch, Text, View } from 'react-native'
 
 import { FormScreen } from '@/components/auth/FormScreen'
-import { myActions, useMyProfile, type NotificationSettings } from '@/features/my/store'
+import { myActions, useMyInfo, type NotificationSettings } from '@/features/my/store'
 import { colors } from '@/theme'
 
 const ROWS: { key: keyof NotificationSettings; label: string; caption: string }[] = [
@@ -10,9 +10,12 @@ const ROWS: { key: keyof NotificationSettings; label: string; caption: string }[
   { key: 'update', label: '서비스 업데이트 알림', caption: '새로운 기능과 공지를 알려드려요' },
 ]
 
-/** Figma: 알림 설정. 전체 알림은 아래 항목을 한 번에 켜고 끈다 */
+/**
+ * Figma: 알림 설정. 전체 알림은 아래 항목을 한 번에 켜고 끈다.
+ * 서버 API 가 아직 없어 이 기기에서 앱을 켜 둔 동안만 유지된다
+ */
 export default function NotificationSettingScreen() {
-  const { notifications } = useMyProfile()
+  const { notifications } = useMyInfo()
   const allOn = ROWS.every((row) => notifications[row.key])
 
   return (

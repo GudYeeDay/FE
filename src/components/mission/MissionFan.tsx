@@ -23,7 +23,7 @@ const DEAL_DURATION_MS = 420
 
 type Props = {
   missions: Mission[]
-  savedIds: ReadonlySet<string>
+  savedIds: ReadonlySet<number>
   onSelect: (index: number) => void
 }
 

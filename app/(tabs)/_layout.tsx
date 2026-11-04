@@ -3,12 +3,12 @@ import { Tabs, useRouter } from 'expo-router'
 
 import { BottomTabBar } from '@/components'
 import { MissionRecommendModal } from '@/components/mission/MissionRecommendModal'
-import { useMissionStore } from '@/features/mission/store'
+import { useActiveMission } from '@/features/mission/api'
 
 export default function TabsLayout() {
   const router = useRouter()
   const [recommendOpen, setRecommendOpen] = useState(false)
-  const hasActiveMission = useMissionStore((s) => s.active !== null)
+  const hasActiveMission = Boolean(useActiveMission().data)
 
   return (
     <>

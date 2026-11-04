@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from 'react-native'
 
 import { NotificationMarkIcon } from '@/components/icons'
-import type { AppNotification } from '@/features/notification/store'
+import type { AppNotification } from '@/features/notification/api'
 import { cn } from '@/lib/cn'
 
 type Props = {

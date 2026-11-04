@@ -1,9 +1,9 @@
 import { Pressable, Text, View } from 'react-native'
 
 import { MoreVerticalIcon } from '@/components/icons'
-import { formatMonthDay } from '@/features/mission/store'
 import type { ArchiveItem } from '@/features/mission/types'
 import { cn } from '@/lib/cn'
+import { formatMonthDay } from '@/lib/date'
 import { colors } from '@/theme'
 
 type Props = {
@@ -17,8 +17,8 @@ type Props = {
 export function ArchiveRow({ index, item, onPress, onPressMore }: Props) {
   const done = item.status === 'done'
   const dateLabel = done
-    ? `${formatMonthDay(item.doneAt ?? item.savedAt)} 완료`
-    : `${formatMonthDay(item.savedAt)} 저장`
+    ? `${formatMonthDay(item.date)} 완료`
+    : `${formatMonthDay(item.date)} 저장${item.status === 'inProgress' ? ' · 진행중' : ''}`
 
   return (
     <Pressable
@@ -48,7 +48,7 @@ export function ArchiveRow({ index, item, onPress, onPressMore }: Props) {
               : undefined
           }
         >
-          {item.mission.title}
+          {item.title}
         </Text>
         <Text className="mt-[25px] font-ko text-[14px] leading-[17.6px] tracking-[-0.344px] text-ink-soft">
           {dateLabel}

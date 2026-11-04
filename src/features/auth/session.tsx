@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react'
 
 import { apiFetch, restoreTokens, setTokens, useAuthStatus } from '@/api/http'
+import { myActions } from '@/features/my/store'
 import { queryClient } from '@/lib/query-client'
 
 type Session = {
@@ -22,6 +23,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     restoreTokens()
+    myActions.restore()
   }, [])
 
   const value = useMemo(
@@ -31,6 +33,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       signOut: async () => {
         await apiFetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
         setTokens(null, null)
+        myActions.clear()
         queryClient.clear()
       },
     }),

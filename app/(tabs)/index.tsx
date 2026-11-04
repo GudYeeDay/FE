@@ -6,19 +6,17 @@ import { ActiveMissionBanner } from '@/components/home/ActiveMissionBanner'
 import { PastRecordCard } from '@/components/home/PastRecordCard'
 import { WeekStrip } from '@/components/home/WeekStrip'
 import { BellIcon } from '@/components/icons'
+import { remoteErrorText } from '@/api/http'
 import { useHomeSummary } from '@/features/home/api'
-import { useMyProfile } from '@/features/my/store'
-import { useHasNewNotification } from '@/features/notification/store'
-import { useMissionStore } from '@/features/mission/store'
+import { useActiveMission } from '@/features/mission/api'
 import { colors } from '@/theme'
 
 /** Figma: 홈 */
 export default function HomeScreen() {
   const router = useRouter()
-  const { data, isPending } = useHomeSummary()
-  const { name } = useMyProfile()
-  const activeMission = useMissionStore((s) => s.active)
-  const hasNewNotification = useHasNewNotification()
+  const { data, isPending, isError, error, refetch } = useHomeSummary()
+  const activeMission = useActiveMission().data
+  const hasNewNotification = data?.hasUnreadNotification ?? false
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
@@ -27,9 +25,7 @@ export default function HomeScreen() {
         {/* 인사 + 기록 일수 */}
         <View className="flex-row items-start justify-between px-5 pt-3.5">
           <View>
-            <Text className="font-ko text-ko-12 text-ink">
-              {name} 님의 굳이데이
-            </Text>
+            <Text className="font-ko text-ko-12 text-ink">{data?.name ?? ''} 님의 굳이데이</Text>
             <Text className="font-ko-bold text-ko-20 text-ink">낭만을 기록해보세요</Text>
           </View>
           <View className="items-end">
@@ -54,7 +50,16 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {isPending || !data ? (
+        {isError ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => refetch()}
+            className="h-80 items-center justify-center"
+          >
+            <Text className="font-ko text-ko-14 text-ink-soft">{remoteErrorText(error)}</Text>
+            <Text className="mt-2 font-ko text-ko-12 text-ink-faint">눌러서 다시 불러오기</Text>
+          </Pressable>
+        ) : isPending || !data ? (
           <View className="h-80 items-center justify-center">
             <ActivityIndicator color={colors.ink.faint} />
           </View>
@@ -62,7 +67,7 @@ export default function HomeScreen() {
           <>
             <View className="mt-4">
               {/* Figma 주석: 주별 사진·지난 낭만들 사진을 누르면 그날의 데일리 피드로 이동 */}
-              <WeekStrip week={data.week} onPressDay={(r) => router.push(`/feed/${r.date}`)} />
+              <WeekStrip week={data.week} onPressDay={(date) => router.push(`/feed/${date}`)} />
             </View>
 
             <View className="mt-5 px-5">
@@ -73,20 +78,26 @@ export default function HomeScreen() {
                 그동안 쌓아온 기록을 다시 돌아보세요
               </Text>
             </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="mt-[18px]"
-              contentContainerClassName="gap-2 px-5"
-            >
-              {data.pastRecords.map((record) => (
-                <PastRecordCard
-                  key={record.id}
-                  record={record}
-                  onPress={() => router.push(`/feed/${record.date}`)}
-                />
-              ))}
-            </ScrollView>
+            {data.pastRecords.length === 0 ? (
+              <Text className="mt-[18px] px-5 font-ko text-ko-12 text-ink-faint">
+                지난주까지 남긴 기록이 여기에 보여요
+              </Text>
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="mt-[18px]"
+                contentContainerClassName="gap-2 px-5"
+              >
+                {data.pastRecords.map((record) => (
+                  <PastRecordCard
+                    key={record.id}
+                    record={record}
+                    onPress={() => router.push(`/feed/${record.date}`)}
+                  />
+                ))}
+              </ScrollView>
+            )}
           </>
         )}
       </View>
