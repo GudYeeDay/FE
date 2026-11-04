@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router'
 import { Button, TextField } from '@/components'
 import { EmailVerificationFields } from '@/components/auth/EmailVerificationFields'
 import { FormScreen } from '@/components/auth/FormScreen'
+import { setPendingSignup } from '@/features/auth/api'
 import { useEmailVerification } from '@/features/auth/useEmailVerification'
 import { fieldError, rules } from '@/features/auth/validation'
 
@@ -32,8 +33,16 @@ export default function SignupScreen() {
       footer={
         <Button
           disabled={!canSubmit}
-          // TODO: 가입 정보는 약관 동의 후 함께 전송 (API 연동 시 상태 전달 방식 결정)
-          onPress={() => router.push('/terms')}
+          // 가입 요청은 약관 동의 화면의 시작하기에서 보낸다
+          onPress={() => {
+            setPendingSignup({
+              email: verification.email.trim(),
+              name: nickname,
+              password,
+              passwordCheck: passwordConfirm,
+            })
+            router.push('/terms')
+          }}
         >
           가입하기
         </Button>

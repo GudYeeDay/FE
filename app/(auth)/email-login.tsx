@@ -5,23 +5,21 @@ import { useRouter } from 'expo-router'
 import { Button, TextField } from '@/components'
 import { FormScreen } from '@/components/auth/FormScreen'
 import { TextLink } from '@/components/auth/TextLink'
-import { useSession } from '@/features/auth/session'
+import { loginErrorText, useLogin } from '@/features/auth/api'
 import { fieldError, rules } from '@/features/auth/validation'
 
 /** Figma: 로컬 로그인 */
 export default function EmailLoginScreen() {
   const router = useRouter()
-  const { signIn } = useSession()
+  const login = useLogin()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
   const emailValid = rules.email.test(email)
-  const canSubmit = emailValid && password.length > 0
+  const canSubmit = emailValid && password.length > 0 && !login.isPending
 
-  const submit = () => {
-    // TODO: 로그인 API 연동. 실패 시 비밀번호 칸에 에러 문구 표시
-    signIn()
-  }
+  // 성공하면 토큰이 저장되면서 홈으로 바뀐다 (app/_layout.tsx 의 Stack.Protected)
+  const submit = () => login.mutate({ email: email.trim(), password })
 
   return (
     <FormScreen
@@ -46,7 +44,10 @@ export default function EmailLoginScreen() {
         autoComplete="email"
         textContentType="emailAddress"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(v) => {
+          setEmail(v)
+          login.reset()
+        }}
         errorMessage={fieldError(email, emailValid, rules.email.error)}
       />
       <TextField
@@ -57,7 +58,11 @@ export default function EmailLoginScreen() {
         autoComplete="current-password"
         textContentType="password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(v) => {
+          setPassword(v)
+          login.reset()
+        }}
+        errorMessage={login.isError ? loginErrorText(login.error) : undefined}
         returnKeyType="done"
         onSubmitEditing={() => canSubmit && submit()}
       />

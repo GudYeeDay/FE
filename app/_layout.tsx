@@ -29,10 +29,6 @@ export default function RootLayout() {
     Inter_500Medium,
   })
 
-  useEffect(() => {
-    if (fontsLoaded || fontError) SplashScreen.hideAsync()
-  }, [fontsLoaded, fontError])
-
   // 폰트 로드 전에는 스플래시 유지 (폰트 없이 그려진 뒤 깜빡이는 것 방지)
   if (!fontsLoaded && !fontError) return null
 
@@ -48,7 +44,14 @@ export default function RootLayout() {
 
 /** 로그인 전에는 (auth) 화면만, 로그인 후에는 탭 화면만 접근 가능 */
 function RootNavigator() {
-  const { isSignedIn } = useSession()
+  const { isRestoring, isSignedIn } = useSession()
+
+  // 저장된 토큰을 읽기 전에 그리면 로그인 화면이 잠깐 보였다가 홈으로 바뀐다
+  useEffect(() => {
+    if (!isRestoring) SplashScreen.hideAsync()
+  }, [isRestoring])
+
+  if (isRestoring) return null
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
