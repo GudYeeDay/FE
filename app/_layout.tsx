@@ -61,6 +61,9 @@ function RootNavigator() {
         <Stack.Screen name="feed/[date]" />
         <Stack.Screen name="notifications/index" />
         <Stack.Screen name="notifications/[id]" />
+        <Stack.Screen name="my/name" />
+        <Stack.Screen name="my/password" />
+        <Stack.Screen name="my/notifications" />
       </Stack.Protected>
       <Stack.Protected guard={!isSignedIn}>
         <Stack.Screen name="(auth)" />
