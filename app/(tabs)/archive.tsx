@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react'
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 
 import { ArchiveRow } from '@/components/archive/ArchiveRow'
 import { ArchiveTabs, type ArchiveFilter } from '@/components/archive/ArchiveTabs'
-import { PenIcon, PlusLineIcon, TrashIcon } from '@/components/icons'
+import { PlusLineIcon, TrashIcon } from '@/components/icons'
 import { BottomSheet, BottomSheetItem } from '@/components/ui/BottomSheet'
 import { DeleteArchiveDialog } from '@/components/archive/DeleteArchiveDialog'
-import { useMissionStore } from '@/features/mission/store'
+import { remoteErrorText } from '@/api/http'
+import { useArchive } from '@/features/archive/api'
 import type { ArchiveItem } from '@/features/mission/types'
 import { colors } from '@/theme'
 
@@ -21,13 +22,16 @@ const EMPTY_MESSAGE: Record<ArchiveFilter, string> = {
 /** Figma: 보관함 - 리스트 / 남은미션 / 완료미션 / 빈상태 */
 export default function ArchiveScreen() {
   const router = useRouter()
-  const archive = useMissionStore((s) => s.archive)
+  const { data: archive = [], isPending, isError, error, refetch } = useArchive()
   const [filter, setFilter] = useState<ArchiveFilter>('all')
   const [sheetItem, setSheetItem] = useState<ArchiveItem | null>(null)
   const [deleteItem, setDeleteItem] = useState<ArchiveItem | null>(null)
 
   const items = useMemo(
-    () => (filter === 'all' ? archive : archive.filter((a) => a.status === filter)),
+    () =>
+      archive.filter((a) =>
+        filter === 'all' ? true : filter === 'done' ? a.status === 'done' : a.status !== 'done',
+      ),
     [archive, filter],
   )
 
@@ -42,7 +46,20 @@ export default function ArchiveScreen() {
         <ArchiveTabs value={filter} onChange={setFilter} />
       </View>
 
-      {items.length === 0 ? (
+      {isError ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => refetch()}
+          className="flex-1 items-center justify-center pb-24"
+        >
+          <Text className="font-ko text-ko-14 text-ink-soft">{remoteErrorText(error)}</Text>
+          <Text className="mt-2 font-ko text-ko-12 text-ink-faint">눌러서 다시 불러오기</Text>
+        </Pressable>
+      ) : isPending ? (
+        <View className="flex-1 items-center justify-center pb-24">
+          <ActivityIndicator color={colors.ink.faint} />
+        </View>
+      ) : items.length === 0 ? (
         <View className="flex-1 items-center justify-center pb-24">
           <Text className="font-en-medium text-en-16 text-ink-soft">{EMPTY_MESSAGE[filter]}</Text>
         </View>
@@ -50,13 +67,13 @@ export default function ArchiveScreen() {
         <ScrollView contentContainerClassName="px-5 pb-28" showsVerticalScrollIndicator={false}>
           {items.map((item, index) => (
             <ArchiveRow
-              key={item.mission.id + item.status}
+              key={item.bookmarkId}
               index={index}
               item={item}
               onPress={() =>
                 router.push({
                   pathname: '/archive/[id]',
-                  params: { id: item.mission.id, status: item.status },
+                  params: { id: item.bookmarkId, status: item.status, date: item.date },
                 })
               }
               onPressMore={() => setSheetItem(item)}
@@ -77,20 +94,9 @@ export default function ArchiveScreen() {
       <BottomSheet
         visible={!!sheetItem}
         onClose={() => setSheetItem(null)}
-        title={sheetItem?.mission.title}
+        title={sheetItem?.title}
       >
-        {/* 완료한 미션은 수정할 수 없고 삭제만 가능 (Figma 2번째 시트) */}
-        {sheetItem?.status === 'saved' ? (
-          <BottomSheetItem
-            icon={<PenIcon width={24} height={24} color={colors.ink.DEFAULT} />}
-            label="수정하기"
-            onPress={() => {
-              const id = sheetItem.mission.id
-              setSheetItem(null)
-              router.push({ pathname: '/mission/new', params: { id } })
-            }}
-          />
-        ) : null}
+        {/* Figma 에는 저장한 미션 "수정하기" 가 있지만 서버에 수정 API 가 없어 삭제만 둔다 */}
         <BottomSheetItem
           icon={<TrashIcon width={24} height={24} color={colors.brand[80]} />}
           label="삭제하기"

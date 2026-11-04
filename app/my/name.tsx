@@ -1,22 +1,24 @@
 import { useState } from 'react'
-import { Pressable } from 'react-native'
+import { Alert, Pressable } from 'react-native'
 import { useRouter } from 'expo-router'
 
 import { Button, TextField } from '@/components'
 import { FormScreen } from '@/components/auth/FormScreen'
 import { CloseCircleIcon } from '@/components/icons'
 import { fieldError, rules } from '@/features/auth/validation'
-import { myActions, useMyProfile } from '@/features/my/store'
+import { errorText } from '@/api/http'
+import { useChangeName, useMyProfile } from '@/features/my/api'
 import { colors } from '@/theme'
 
 /** Figma: 이름 설정 */
 export default function NameSettingScreen() {
   const router = useRouter()
-  const { name } = useMyProfile()
+  const name = useMyProfile().data?.name ?? ''
+  const changeName = useChangeName()
   const [value, setValue] = useState(name)
 
   const valid = rules.nickname.test(value)
-  const canSave = valid && value !== name
+  const canSave = valid && value !== name && !changeName.isPending
 
   return (
     <FormScreen
@@ -24,10 +26,12 @@ export default function NameSettingScreen() {
       footer={
         <Button
           disabled={!canSave}
-          onPress={() => {
-            myActions.setName(value)
-            router.back()
-          }}
+          onPress={() =>
+            changeName.mutate(value, {
+              onSuccess: () => router.back(),
+              onError: (error) => Alert.alert('이름을 바꾸지 못했어요', errorText(error)),
+            })
+          }
         >
           저장하기
         </Button>

@@ -1,18 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { ApiError, apiFetch, setTokens } from '@/api/http'
+import { ApiError, apiFetch, errorText, setTokens } from '@/api/http'
 import type {
   ApiResponse,
   AuthSession,
   EmailCodeSendResponse,
   EmailVerificationResponse,
 } from '@/api/types'
+import { myActions } from '@/features/my/store'
 
 export function loginErrorText(error: unknown, fallback = '이메일 또는 비밀번호를 확인해 주세요') {
-  if (!(error instanceof ApiError)) return '서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요'
-  // 서버 메시지가 없으면 상태 코드만 들어 있다
-  if (error.message && !/^\d+$/.test(error.message)) return error.message
-  return fallback
+  return errorText(error, fallback)
 }
 
 export type PendingSignup = {
@@ -61,11 +59,11 @@ export function useLogin() {
       })
       const session = res.result
       if (!session?.accessToken) throw new ApiError(200, '로그인에 실패했어요')
+      // 이전 계정의 캐시는 토큰을 넣기 전에 비운다. 넣은 뒤에 비우면 막 시작한 홈 요청까지 지워진다
+      queryClient.removeQueries()
+      myActions.setAccount(session)
       setTokens(session.accessToken, session.refreshToken ?? null)
       return session
-    },
-    onSuccess: () => {
-      queryClient.clear()
     },
   })
 }
@@ -80,12 +78,15 @@ export function useSignup() {
         auth: false,
       })
       const session = res.result
-      if (session?.accessToken) setTokens(session.accessToken, session.refreshToken ?? null)
+      if (session?.accessToken) {
+        queryClient.removeQueries()
+        myActions.setAccount(session)
+        setTokens(session.accessToken, session.refreshToken ?? null)
+      }
       return session
     },
     onSuccess: () => {
       pendingSignup = null
-      queryClient.clear()
     },
   })
 }

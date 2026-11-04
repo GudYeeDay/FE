@@ -1,48 +1,50 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { toISODate } from '@/lib/date'
-import { coverRecords, getRecordState } from '@/features/record/store'
+import { apiFetch, useSignedIn } from '@/api/http'
+import type { ApiResponse, HomeResponse } from '@/api/types'
 import type { MissionRecord } from '@/features/record/types'
 
-export type DayRecord = {
-  date: Date
-  /** 그날의 대표 기록. 기록이 없는 날은 없음 */
-  cover?: MissionRecord
+export type WeekDay = {
+  /** YYYY-MM-DD */
+  date: string
+  /** 그날의 사진. 없는 날은 빈 칸 */
+  photo?: { uri: string }
 }
 
 export type HomeSummary = {
+  name: string
+  hasUnreadNotification: boolean
+  /** 이번 달에 기록한 날 수 */
   recordDays: number
-  week: DayRecord[]
+  week: WeekDay[]
+  /** 지난 주까지의 기록 중 랜덤 5개. 본문 자리에는 미션 설명이 온다 */
   pastRecords: MissionRecord[]
 }
 
-/** 오늘이 속한 주의 월요일 */
-export function startOfWeek(today: Date) {
-  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  const diff = (d.getDay() + 6) % 7 // 월=0 ... 일=6
-  d.setDate(d.getDate() - diff)
-  return d
-}
-
-// TODO: 홈 요약 API 연동. 지금은 기록 스토어(목업)에서 만든다
-async function fetchHomeSummary(): Promise<HomeSummary> {
-  await new Promise((r) => setTimeout(r, 200))
-  const covers = coverRecords(getRecordState())
-  const coverByDate = new Map(covers.map((r) => [r.date, r]))
-
-  const monday = startOfWeek(new Date())
-  const week = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date(monday)
-    date.setDate(monday.getDate() + i)
-    return { date, cover: coverByDate.get(toISODate(date)) }
-  })
-
-  // Figma 개발 주석: 지난 낭만들은 "랜덤으로 5개"
-  const pastRecords = [...getRecordState().records].sort(() => Math.random() - 0.5).slice(0, 5)
-
-  return { recordDays: covers.length, week, pastRecords }
-}
-
 export function useHomeSummary() {
-  return useQuery({ queryKey: ['home', 'summary'], queryFn: fetchHomeSummary })
+  const signedIn = useSignedIn()
+  return useQuery({
+    queryKey: ['home'],
+    enabled: signedIn,
+    queryFn: async (): Promise<HomeSummary> => {
+      const { result } = await apiFetch<ApiResponse<HomeResponse>>('/api/home')
+      return {
+        name: result.name,
+        hasUnreadNotification: result.hasUnreadNotification,
+        recordDays: result.monthlyCompletedDays,
+        week: result.weeklyPhotos.days.map((d) => ({
+          date: d.date,
+          photo: d.imageUrl ? { uri: d.imageUrl } : undefined,
+        })),
+        pastRecords: result.pastRecords.map((r) => ({
+          id: r.completeMissionId,
+          title: r.title,
+          body: r.description ?? '',
+          place: r.location ?? '',
+          date: r.date,
+          photo: { uri: r.imageUrl },
+        })),
+      }
+    },
+  })
 }

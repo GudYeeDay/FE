@@ -1,39 +1,43 @@
 import { useState } from 'react'
-import { Text, TextInput, View } from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { Alert, Text, TextInput, View } from 'react-native'
+import { useRouter } from 'expo-router'
 
 import { Button } from '@/components'
 import { FormScreen } from '@/components/auth/FormScreen'
-import { missionActions, useMissionStore } from '@/features/mission/store'
+import { errorText } from '@/api/http'
+import { useCreateCustomMission } from '@/features/archive/api'
 import { colors } from '@/theme'
 
 const TITLE_MAX = 30
 const DESCRIPTION_MAX = 100
 
-/** Figma: 커스텀 미션 추가. ?id= 가 있으면 같은 화면으로 수정한다. */
+/**
+ * Figma: 커스텀 미션 추가. 만들면 보관함에 저장된다.
+ * Figma 의 "미션 수정" 은 서버에 수정 API 가 없어 아직 없다. 서버는 이름·설명 둘 다 필수로 받는다
+ */
 export default function CustomMissionScreen() {
   const router = useRouter()
-  const { id } = useLocalSearchParams<{ id?: string }>()
-  const editing = useMissionStore((s) => s.archive.find((a) => a.mission.id === id))
-
-  const [title, setTitle] = useState(editing?.mission.title ?? '')
-  const [description, setDescription] = useState(editing?.mission.description ?? '')
-  const canSubmit = title.trim().length > 0
+  const create = useCreateCustomMission()
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const canSubmit = title.trim().length > 0 && description.trim().length > 0 && !create.isPending
 
   const submit = () => {
-    const input = { title: title.trim(), description: description.trim() }
-    // TODO: 커스텀 미션 생성/수정 API 연동
-    if (editing) missionActions.update(editing.mission.id, input)
-    else missionActions.addCustom(input)
-    router.back()
+    create.mutate(
+      { title: title.trim(), description: description.trim() },
+      {
+        onSuccess: () => router.back(),
+        onError: (error) => Alert.alert('미션을 추가하지 못했어요', errorText(error)),
+      },
+    )
   }
 
   return (
     <FormScreen
-      title={editing ? '미션 수정' : '커스텀 미션 추가'}
+      title="커스텀 미션 추가"
       footer={
         <Button disabled={!canSubmit} onPress={submit}>
-          {editing ? '수정하기' : '추가하기'}
+          추가하기
         </Button>
       }
     >

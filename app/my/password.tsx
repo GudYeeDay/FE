@@ -1,11 +1,16 @@
 import { useState } from 'react'
-import { Text, View } from 'react-native'
+import { Alert, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 
 import { Button, TextField } from '@/components'
 import { FormScreen } from '@/components/auth/FormScreen'
 import { fieldError, rules } from '@/features/auth/validation'
-import { useMyProfile, type LoginProvider } from '@/features/my/store'
+import { ApiError, errorText } from '@/api/http'
+import { useChangePassword } from '@/features/my/api'
+import { useMyInfo, type LoginProvider } from '@/features/my/store'
+
+/** 입력칸 아래에 보여주는 서버 오류 */
+const FIELD_ERRORS = ['AUTH4010', 'AUTH4016']
 
 const PROVIDER_LABEL: Record<Exclude<LoginProvider, 'email'>, string> = {
   apple: '애플',
@@ -14,7 +19,7 @@ const PROVIDER_LABEL: Record<Exclude<LoginProvider, 'email'>, string> = {
 
 /** Figma: 비밀번호 변경. 소셜 계정은 안내만 보여준다 */
 export default function PasswordSettingScreen() {
-  const { email, provider } = useMyProfile()
+  const { email, provider } = useMyInfo()
 
   if (provider !== 'email') {
     return (
@@ -41,10 +46,16 @@ function EmailPasswordForm({ email }: { email: string }) {
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
   const [confirm, setConfirm] = useState('')
+  const change = useChangePassword()
 
   const nextValid = rules.password.test(next)
   const confirmValid = confirm === next
-  const canSubmit = current.length > 0 && nextValid && confirm.length > 0 && confirmValid
+  const canSubmit =
+    current.length > 0 && nextValid && confirm.length > 0 && confirmValid && !change.isPending
+  // 현재 비밀번호가 틀리거나(AUTH4010) 새 비밀번호가 같으면(AUTH4016) 해당 칸에 서버 문구를 보여준다
+  const code = change.error instanceof ApiError ? change.error.code : undefined
+  const currentError = code === 'AUTH4010' ? '현재 비밀번호가 일치하지 않아요' : undefined
+  const nextError = code === 'AUTH4016' ? errorText(change.error) : undefined
 
   return (
     <FormScreen
@@ -52,10 +63,21 @@ function EmailPasswordForm({ email }: { email: string }) {
       footer={
         <Button
           disabled={!canSubmit}
-          onPress={() => {
-            // TODO: 비밀번호 변경 API 연동 (현재 비밀번호 불일치 에러 처리 포함)
-            router.back()
-          }}
+          onPress={() =>
+            change.mutate(
+              { currentPassword: current, newPassword: next, newPasswordCheck: confirm },
+              {
+                onSuccess: () => {
+                  Alert.alert('비밀번호를 변경했어요')
+                  router.back()
+                },
+                onError: (error) => {
+                  const shown = error instanceof ApiError && FIELD_ERRORS.includes(error.code ?? '')
+                  if (!shown) Alert.alert('비밀번호를 변경하지 못했어요', errorText(error))
+                },
+              },
+            )
+          }
         >
           변경하기
         </Button>
@@ -68,7 +90,11 @@ function EmailPasswordForm({ email }: { email: string }) {
         placeholder="현재 비밀번호 입력"
         secure
         value={current}
-        onChangeText={setCurrent}
+        onChangeText={(v) => {
+          setCurrent(v)
+          change.reset()
+        }}
+        errorMessage={currentError}
       />
       <TextField
         className="mt-7"
@@ -76,8 +102,11 @@ function EmailPasswordForm({ email }: { email: string }) {
         placeholder={rules.password.placeholder}
         secure
         value={next}
-        onChangeText={setNext}
-        errorMessage={fieldError(next, nextValid, rules.password.error)}
+        onChangeText={(v) => {
+          setNext(v)
+          change.reset()
+        }}
+        errorMessage={nextError ?? fieldError(next, nextValid, rules.password.error)}
       />
       <TextField
         className="mt-7"

@@ -16,3 +16,9 @@ export function formatDotDate(iso: string) {
 export function formatSpacedDate(iso: string) {
   return iso.replaceAll('-', '. ')
 }
+
+/** 서버 보관함 날짜 "11.04" → "11.4" (sep 를 ". " 로 주면 "11. 4") */
+export function formatMonthDay(md: string, sep = '.') {
+  const [m, d] = md.split('.').map(Number)
+  return `${m}${sep}${d}`
+}

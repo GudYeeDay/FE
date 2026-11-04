@@ -23,7 +23,7 @@ const CAROUSEL_HEIGHT = MISSION_CARD_HEIGHT + 27
 
 type Props = {
   missions: Mission[]
-  savedIds: ReadonlySet<string>
+  savedIds: ReadonlySet<number>
   onToggleSaved: (mission: Mission) => void
   onStart: (mission: Mission) => void
   /** 처음 가운데에 올 카드 (펼침 화면에서 탭한 카드) */

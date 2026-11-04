@@ -24,7 +24,9 @@ export function useChangeName() {
         body: JSON.stringify({ name }),
       }),
     onSuccess: async () => {
+      // 홈 인사말도 이름을 쓴다
       await queryClient.invalidateQueries({ queryKey: ['profile'] })
+      await queryClient.invalidateQueries({ queryKey: ['home'] })
     },
   })
 }

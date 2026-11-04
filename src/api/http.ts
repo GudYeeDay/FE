@@ -83,6 +83,14 @@ export function apiBaseUrl() {
   return REMOTE_URL.replace(/\/$/, '')
 }
 
+/** 서버가 준 오류 문구. 없거나 네트워크 오류면 fallback / 연결 실패 문구 */
+export function errorText(error: unknown, fallback = '잠시 후 다시 시도해 주세요') {
+  if (!(error instanceof ApiError)) return '서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요'
+  // 서버 메시지가 없으면 상태 코드만 들어 있다
+  if (error.message && !/^\d+$/.test(error.message)) return error.message
+  return fallback
+}
+
 export function remoteErrorText(error: unknown) {
   if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
     return '로그인 후 볼 수 있어요'
@@ -131,7 +139,10 @@ function reissueAccessToken() {
 export async function apiFetch<T>(path: string, options?: ApiOptions): Promise<T> {
   const { auth = true, retry = true, ...init } = options ?? {}
   const headers = new Headers(init.headers)
-  if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  // FormData(사진 업로드)는 fetch 가 boundary 를 붙여 Content-Type 을 정한다
+  if (typeof init.body === 'string' && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
   if (auth && accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
 
   const res = await fetch(`${apiBaseUrl()}${path}`, { ...init, headers })
@@ -139,12 +150,6 @@ export async function apiFetch<T>(path: string, options?: ApiOptions): Promise<T
   const data = text ? safeJson(text) : undefined
 
   if (!res.ok) {
-    // 서버는 토큰이 만료되면 401이 아니라 403을 준다 (Spring Security 기본 동작)
-    const unauthorized = res.status === 401 || res.status === 403
-    if (retry && auth && unauthorized && refreshToken) {
-      const refreshed = await reissueAccessToken()
-      if (refreshed) return apiFetch<T>(path, { ...options, retry: false })
-    }
     const message =
       data && typeof data === 'object' && 'message' in data && typeof data.message === 'string'
         ? data.message
@@ -153,6 +158,13 @@ export async function apiFetch<T>(path: string, options?: ApiOptions): Promise<T
       data && typeof data === 'object' && 'code' in data && typeof data.code === 'string'
         ? data.code
         : undefined
+    // 토큰이 만료되면 서버는 본문 없이 403을 준다 (Spring Security 기본 동작).
+    // 오류 코드가 있으면(예: 현재 비밀번호 불일치 401 AUTH4010) 토큰 문제가 아니라서 재발급하지 않는다
+    const tokenRejected = (res.status === 401 || res.status === 403) && !code
+    if (retry && auth && tokenRejected && refreshToken) {
+      const refreshed = await reissueAccessToken()
+      if (refreshed) return apiFetch<T>(path, { ...options, retry: false })
+    }
     throw new ApiError(res.status, message, code)
   }
 

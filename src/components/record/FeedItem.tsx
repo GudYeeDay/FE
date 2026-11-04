@@ -13,7 +13,8 @@ type Props = {
   record: MissionRecord
   nickname: string
   isCover: boolean
-  onPressCover: () => void
+  /** 대표 사진 지정. 서버 API 가 없어 지금은 넘기지 않는다 (가장 최근 기록이 대표) */
+  onPressCover?: () => void
   /** 더보기 버튼의 화면 위치를 넘겨서 메뉴를 그 아래에 띄운다 */
   onPressMore: (anchor: AnchorRect) => void
   /** 첫 기록에만 닫기 버튼이 붙는다 */
@@ -73,6 +74,7 @@ export function FeedItem({ record, nickname, isCover, onPressCover, onPressMore,
           accessibilityState={{ selected: isCover }}
           accessibilityLabel={isCover ? '대표 사진' : '대표 사진으로 지정'}
           hitSlop={6}
+          disabled={!onPressCover}
           onPress={onPressCover}
           className={cn(
             'absolute left-5 top-5 rounded-lg px-2 py-1',

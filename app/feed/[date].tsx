@@ -1,30 +1,30 @@
-import { useMemo, useState } from 'react'
-import { Modal, ScrollView, Text, View } from 'react-native'
+import { useState } from 'react'
+import { ActivityIndicator, Alert, Modal, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 
+import { errorText, remoteErrorText } from '@/api/http'
 import { Header } from '@/components'
 import { FeedItem, type AnchorRect } from '@/components/record/FeedItem'
 import { FeedMenu } from '@/components/record/FeedMenu'
 import { Dialog } from '@/components/ui/Dialog'
-import { useMyProfile } from '@/features/my/store'
-import { coverIdOn, recordActions, recordsOn, useRecordStore } from '@/features/record/store'
+import { useMyProfile } from '@/features/my/api'
+import { useDailyFeed, useDeleteRecord } from '@/features/record/api'
 import type { MissionRecord } from '@/features/record/types'
+import { colors } from '@/theme'
 
 /**
  * Figma: 데일리 피드 / 피드 여러개인 경우 / 데일리 피드 - 캘린더.
  * 그날 남긴 기록을 위아래로 이어서 보여준다. 최근 기록이 위.
+ * 대표 사진은 가장 최근 기록 (직접 지정하는 API 가 아직 없다)
  * 닫기: 기록 저장 직후에 열렸으면 홈으로, 그 밖에는 이전 화면(홈·캘린더)으로.
  */
 export default function DailyFeedScreen() {
   const router = useRouter()
   const { date, from } = useLocalSearchParams<{ date: string; from?: 'record' }>()
-  const records = useRecordStore((s) => s.records)
-  const covers = useRecordStore((s) => s.covers)
-  const nickname = useMyProfile().name
-
-  const dayRecords = useMemo(() => recordsOn(records, date), [records, date])
-  const coverId = coverIdOn({ records, covers }, date)
+  const { data: dayRecords = [], isPending, isError, error } = useDailyFeed(date)
+  const nickname = useMyProfile().data?.name ?? ''
+  const deleteRecord = useDeleteRecord()
 
   const [menu, setMenu] = useState<{ record: MissionRecord; anchor: AnchorRect } | null>(null)
   const [deleting, setDeleting] = useState<MissionRecord | null>(null)
@@ -43,7 +43,13 @@ export default function DailyFeedScreen() {
       <SafeAreaView className="flex-1 bg-white">
         <Header title="" onBack={close} />
         <View className="flex-1 items-center justify-center">
-          <Text className="font-ko text-ko-14 text-ink-soft">이날 남긴 기록이 없어요</Text>
+          {isPending ? (
+            <ActivityIndicator color={colors.ink.faint} />
+          ) : (
+            <Text className="font-ko text-ko-14 text-ink-soft">
+              {isError ? remoteErrorText(error) : '이날 남긴 기록이 없어요'}
+            </Text>
+          )}
         </View>
       </SafeAreaView>
     )
@@ -61,9 +67,7 @@ export default function DailyFeedScreen() {
               key={record.id}
               record={record}
               nickname={nickname}
-              isCover={record.id === coverId}
-              // TODO: 대표 사진 지정 API 연동
-              onPressCover={() => recordActions.setCover(date, record.id)}
+              isCover={i === 0}
               onPressMore={(anchor) => setMenu({ record, anchor })}
               onClose={i === 0 ? close : undefined}
             />
@@ -90,12 +94,18 @@ export default function DailyFeedScreen() {
             confirmLabel="삭제하기"
             onCancel={() => setDeleting(null)}
             onConfirm={() => {
-              if (!deleting) return
-              // TODO: 기록 삭제 API 연동
+              if (!deleting || deleteRecord.isPending) return
               const wasLast = dayRecords.length === 1
-              recordActions.remove(deleting.id)
-              setDeleting(null)
-              if (wasLast) close()
+              deleteRecord.mutate(deleting.id, {
+                onSuccess: () => {
+                  setDeleting(null)
+                  if (wasLast) close()
+                },
+                onError: (e) => {
+                  setDeleting(null)
+                  Alert.alert('기록을 삭제하지 못했어요', errorText(e))
+                },
+              })
             }}
           />
         </View>
@@ -107,12 +117,12 @@ export default function DailyFeedScreen() {
         onSaveImage={() => {
           const id = menu!.record.id
           setMenu(null)
-          router.push({ pathname: '/record/share', params: { id } })
+          router.push({ pathname: '/record/share', params: { id, date } })
         }}
         onEdit={() => {
           const id = menu!.record.id
           setMenu(null)
-          router.push({ pathname: '/record/new', params: { id } })
+          router.push({ pathname: '/record/new', params: { id, date } })
         }}
         onDelete={() => {
           setDeleting(menu!.record)
