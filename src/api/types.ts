@@ -81,7 +81,8 @@ export type WeeklyPhotoDay = {
   /** YYYY-MM-DD */
   date: string
   today: boolean
-  weeklyPhotoId: number | null
+  /** 그날 기록 중 사진으로 쓴 기록(가장 늦게 완료한 기록). 그날 기록이 없으면 null */
+  completeMissionId: number | null
   imageUrl: string | null
 }
 

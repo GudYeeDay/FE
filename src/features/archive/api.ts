@@ -79,6 +79,28 @@ export function useCreateCustomMission() {
   })
 }
 
+/** 서버 오류 코드: 추천에서 저장한 미션은 수정할 수 없다 */
+export const NOT_CUSTOM_MISSION = 'MISSION4001'
+
+/**
+ * 직접 만든 미션(custom)의 이름·설명을 고친다.
+ * 미션 자체가 바뀌어서 그 미션의 기록과 진행 중 미션에도 새 이름이 보인다
+ */
+export function useUpdateCustomMission() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ bookmarkId, ...body }: { bookmarkId: number; title: string; description: string }) =>
+      apiFetch<ApiResponse<BookmarkDetail>>(`/api/bookmarks/${bookmarkId}`, {
+        method: 'PUT',
+        body: JSON.stringify(body),
+      }),
+    onSuccess: async () => {
+      const keys = [['bookmarks'], ['mission', 'active'], ['feed'], ['home']]
+      await Promise.all(keys.map((queryKey) => queryClient.invalidateQueries({ queryKey })))
+    },
+  })
+}
+
 export function useStartBookmark() {
   const queryClient = useQueryClient()
   return useMutation({

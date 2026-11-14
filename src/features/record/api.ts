@@ -62,7 +62,7 @@ function recordQuery(input: RecordInput) {
 
 /**
  * 진행 중인 미션을 기록과 함께 완료한다.
- * 홈 주간 사진도 그날 마지막 기록 사진으로 바꾼다 (실패해도 기록은 남아 있으므로 무시)
+ * 보관함에 없던 미션은 서버가 보관함에 저장하고, 홈 주간 사진도 서버가 그날 기록 사진으로 보여 준다
  */
 export function useCreateRecord() {
   const queryClient = useQueryClient()
@@ -75,10 +75,6 @@ export function useCreateRecord() {
         `/api/complete/${userMissionId}?${recordQuery(input)}`,
         { method: 'POST', body: form },
       )
-
-      const weekly = new FormData()
-      weekly.append('file', photoPart(input.photo))
-      await apiFetch('/api/home/weekly-photos', { method: 'POST', body: weekly }).catch(() => {})
 
       return toRecord(res.result)
     },

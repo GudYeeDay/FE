@@ -5,11 +5,11 @@ import { useRouter } from 'expo-router'
 
 import { ArchiveRow } from '@/components/archive/ArchiveRow'
 import { ArchiveTabs, type ArchiveFilter } from '@/components/archive/ArchiveTabs'
-import { PlusLineIcon, TrashIcon } from '@/components/icons'
+import { PenIcon, PlusLineIcon, TrashIcon } from '@/components/icons'
 import { BottomSheet, BottomSheetItem } from '@/components/ui/BottomSheet'
 import { DeleteArchiveDialog } from '@/components/archive/DeleteArchiveDialog'
 import { remoteErrorText } from '@/api/http'
-import { useArchive } from '@/features/archive/api'
+import { useArchive, useBookmark } from '@/features/archive/api'
 import type { ArchiveItem } from '@/features/mission/types'
 import { colors } from '@/theme'
 
@@ -26,6 +26,12 @@ export default function ArchiveScreen() {
   const [filter, setFilter] = useState<ArchiveFilter>('all')
   const [sheetItem, setSheetItem] = useState<ArchiveItem | null>(null)
   const [deleteItem, setDeleteItem] = useState<ArchiveItem | null>(null)
+  // 목록 API 에는 직접 만든 미션인지(custom) 없어서, 시트를 열 때 상세를 불러와 확인한다
+  const sheetDetail = useBookmark(sheetItem?.bookmarkId).data
+  const canEdit =
+    sheetItem?.status !== 'done' &&
+    sheetDetail?.bookmarkId === sheetItem?.bookmarkId &&
+    sheetDetail?.custom === true
 
   const items = useMemo(
     () =>
@@ -96,7 +102,18 @@ export default function ArchiveScreen() {
         onClose={() => setSheetItem(null)}
         title={sheetItem?.title}
       >
-        {/* Figma 에는 저장한 미션 "수정하기" 가 있지만 서버에 수정 API 가 없어 삭제만 둔다 */}
+        {/* 직접 만든 미션만 수정할 수 있다. 완료한 미션은 삭제만 (Figma 2번째 시트) */}
+        {canEdit && sheetItem ? (
+          <BottomSheetItem
+            icon={<PenIcon width={24} height={24} color={colors.ink.DEFAULT} />}
+            label="수정하기"
+            onPress={() => {
+              const id = sheetItem.bookmarkId
+              setSheetItem(null)
+              router.push({ pathname: '/mission/new', params: { id } })
+            }}
+          />
+        ) : null}
         <BottomSheetItem
           icon={<TrashIcon width={24} height={24} color={colors.brand[80]} />}
           label="삭제하기"
