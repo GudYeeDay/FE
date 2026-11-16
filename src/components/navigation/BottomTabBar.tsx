@@ -67,7 +67,8 @@ type Props = BottomTabBarProps & {
 export function BottomTabBar({
   state,
   descriptors,
-  navigation,
+  emitter,
+  navigateToTab,
   centerState = 'add',
   onPressCenter,
 }: Props) {
@@ -91,12 +92,12 @@ export function BottomTabBar({
         accessibilityLabel={options.title ?? route.name}
         className="flex-1 items-center pt-5"
         onPress={() => {
-          const event = navigation.emit({
+          const event = emitter.emit({
             type: 'tabPress',
             target: route.key,
             canPreventDefault: true,
           })
-          if (!focused && !event.defaultPrevented) navigation.navigate(route.name, route.params)
+          if (!focused && !event.defaultPrevented) navigateToTab(route.key)
         }}
       >
         <Icon width={24} height={24} color={focused ? colors.main.soft : colors.ink.DEFAULT} />

@@ -1,4 +1,4 @@
-import { forwardRef, useState, type ReactNode } from 'react'
+import { forwardRef, useState, type ComponentRef, type ReactNode } from 'react'
 import { Pressable, Text, TextInput, View, type TextInputProps } from 'react-native'
 
 import { EyeClosedIcon, EyeIcon } from '@/components/icons'
@@ -30,7 +30,7 @@ type TextFieldProps = Omit<TextInputProps, 'editable' | 'secureTextEntry'> & {
  * 상태: Default(placeholder) / Focus / Filled / Readonly / Error
  * 변형: 기본, 비밀번호(-c, eye 토글), 이메일(-인증요청, 우측 버튼)
  */
-export const TextField = forwardRef<TextInput, TextFieldProps>(function TextField(
+export const TextField = forwardRef<ComponentRef<typeof TextInput>, TextFieldProps>(function TextField(
   {
     label,
     helperText,
