@@ -1,0 +1,23 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "http://ec2-15-164-237-188.ap-northeast-2.compute.amazonaws.com"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "http://ec2-15-164-237-188.ap-northeast-2.compute.amazonaws.com"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
