@@ -72,7 +72,8 @@
             "usesCleartextTraffic": true
           }
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "scheme": "gudyeeday",
     "experiments": {
