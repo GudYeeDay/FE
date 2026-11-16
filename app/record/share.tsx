@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ComponentRef } from 'react'
 import { Alert, Image, Text, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams } from 'expo-router'
@@ -23,7 +23,7 @@ export default function ShareRecordScreen() {
   const { id, date } = useLocalSearchParams<{ id: string; date: string }>()
   const { data: record } = useRecord(date, Number(id))
   const { bottom } = useSafeAreaInsets()
-  const cardRef = useRef<View>(null)
+  const cardRef = useRef<ComponentRef<typeof View>>(null)
 
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, type ComponentRef } from 'react'
 import { Image, Pressable, Text, View, useWindowDimensions } from 'react-native'
 
 import { CloseCircleIcon, MoreVerticalIcon, TitleBarIcon } from '@/components/icons'
@@ -24,7 +24,7 @@ type Props = {
 /** Figma: 데일리 피드의 기록 하나 (작성자 · 사진 · 대표 사진 버튼 · 제목 · 본문 · 날짜와 장소) */
 export function FeedItem({ record, nickname, isCover, onPressCover, onPressMore, onClose }: Props) {
   const { width } = useWindowDimensions()
-  const moreRef = useRef<View>(null)
+  const moreRef = useRef<ComponentRef<typeof View>>(null)
 
   return (
     <View>

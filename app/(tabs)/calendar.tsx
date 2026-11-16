@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, type ComponentRef } from 'react'
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -17,7 +17,7 @@ export default function CalendarScreen() {
   const profile = useMyProfile()
   const months = useMemo(() => monthsSinceSignup(profile.data?.date ?? 1), [profile.data?.date])
   const { days, isPending } = useCalendar(profile.data ? months : [])
-  const scrollRef = useRef<ScrollView>(null)
+  const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null)
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
