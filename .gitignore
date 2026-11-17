@@ -42,3 +42,4 @@ yarn-error.*
 
 # oh-my-claudecode state
 .omc/
+/build
