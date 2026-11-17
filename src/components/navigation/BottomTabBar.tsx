@@ -40,6 +40,12 @@ const PLUS_SIZE = 44
 const BG_TOP = 7.6
 /** 그림자 블러가 잘리지 않도록 SVG 사방에 주는 여백 */
 const SHADOW_PAD = 8
+/**
+ * Figma(375x812, 하단 안전영역 34)에서 탭바 60 은 화면 맨 아래에 붙어 있고 아이콘 아래 여백은 16 뿐이다.
+ * 안전영역 전체를 더하면 바가 34 만큼 떠 보이므로, 안전영역 중 이만큼은 탭바 안쪽 여백(아이콘 아래 16)과 겹치게 둔다.
+ * 34 기준 추가 여백 10 → 아이콘 아래 26, 홈 인디케이터(아래 ~8~13)와는 13 이상 떨어진다.
+ */
+const INSET_OVERLAP = 24
 
 const TAB_ICONS: Record<string, FC<SvgProps>> = {
   index: TabHomeIcon,
@@ -73,7 +79,8 @@ export function BottomTabBar({
   onPressCenter,
 }: Props) {
   const { width } = useWindowDimensions()
-  const { bottom } = useSafeAreaInsets()
+  const { bottom: safeBottom } = useSafeAreaInsets()
+  const extraBottom = Math.max(safeBottom - INSET_OVERLAP, 0)
 
   const routes = state.routes.filter((r) => r.name in TAB_ICONS)
   const left = routes.slice(0, 2)
@@ -106,9 +113,9 @@ export function BottomTabBar({
   }
 
   return (
-    <View style={{ height: BAR_HEIGHT + bottom }}>
-      <TabBarBackground width={width} bottomInset={bottom} />
-      <View className="flex-1 flex-row" style={{ paddingBottom: bottom }}>
+    <View style={{ height: BAR_HEIGHT + extraBottom }}>
+      <TabBarBackground width={width} bottomInset={extraBottom} />
+      <View className="flex-1 flex-row" style={{ paddingBottom: extraBottom }}>
         {left.map(renderTab)}
         <View className="flex-1 items-center">
           <Pressable

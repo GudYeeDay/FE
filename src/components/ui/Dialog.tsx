@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from 'react-native'
 
 import { DialogMarkIcon } from '@/components/icons'
+import { cn } from '@/lib/cn'
 
 type DialogProps = {
   title: string
@@ -39,10 +40,16 @@ export function Dialog({
       }}
     >
       {showMark ? <DialogMarkIcon width={36} height={36} /> : null}
-      <Text className="mt-[11px] font-ko-bold text-[18px] leading-[34px] tracking-[0.38px] text-[#0D0D0D]">
+      {/* Figma ko header 2 (Bold 18, Ink). 마크가 있는 모달(시작 불가)만 행간 34, 없는 모달(로그아웃)은 28 */}
+      <Text
+        className={cn(
+          'font-ko-bold text-ko-18 text-ink',
+          showMark ? 'mt-[11px] leading-[34px]' : null,
+        )}
+      >
         {title}
       </Text>
-      <Text className="mt-2.5 text-center font-en text-en-14 leading-[17.6px] text-ink-faint">
+      <Text className="mt-2.5 text-center font-en text-en-14 leading-[17.6px] tracking-[-0.344px] text-ink-faint">
         {message}
       </Text>
       <View className="mt-[21px] w-full flex-row gap-[15px]">

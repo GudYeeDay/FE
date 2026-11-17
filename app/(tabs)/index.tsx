@@ -42,10 +42,10 @@ export default function HomeScreen() {
               ) : null}
             </Pressable>
             <View className="mt-2.5 flex-row gap-1">
-              <Text className="font-en-medium text-en-12 leading-[17.6px] text-main">
+              <Text className="font-en-medium text-num-12 text-main">
                 {data?.recordDays ?? 0}
               </Text>
-              <Text className="font-ko-medium text-ko-12 text-ink">일 기록</Text>
+              <Text className="font-en-medium text-num-12 text-ink">일 기록</Text>
             </View>
           </View>
         </View>
@@ -71,7 +71,7 @@ export default function HomeScreen() {
             </View>
 
             <View className="mt-5 px-5">
-              <Text className="font-ko-bold text-[18px] leading-[28px] tracking-[0.38px] text-ink">
+              <Text className="font-ko-bold text-ko-18 text-ink">
                 지난 낭만들
               </Text>
               <Text className="mt-0.5 font-en-medium text-en-12 text-ink-soft">

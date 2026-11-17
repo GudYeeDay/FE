@@ -126,11 +126,19 @@ export const TextField = forwardRef<ComponentRef<typeof TextInput>, TextFieldPro
       </View>
 
       {bottomText ? (
+        // 문구가 레이아웃 높이를 차지하면 다음 입력칸이 밀려 내려가므로 밑줄 아래에 띄워 둔다.
+        // 입력칸 사이 최소 간격(mt-7 = 28) 안에 한 줄(4 + 17)만 들어가므로 한 줄로 고정하고,
+        // 긴 문구(서버 에러 등)는 글자를 75%까지 줄여 맞추고 그래도 넘치면 말줄임한다.
         <Text
+          accessibilityLiveRegion="polite"
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
           className={cn(
-            'mt-1 px-1 font-en text-en-14',
+            'absolute left-0 right-0 mt-1 px-1 font-en text-en-14',
             hasError ? 'text-main-soft' : 'text-ink-faint',
           )}
+          style={{ top: '100%' }}
         >
           {bottomText}
         </Text>

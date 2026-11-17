@@ -16,15 +16,20 @@ module.exports = {
         en: ['Inter_400Regular'],
         'en-medium': ['Inter_500Medium'],
       },
-      // Figma 텍스트 스타일: ko 12 / ko 14 / ko 16 / ko header / ko 14 inter / ko 16 inter / en cap
+      // Figma 텍스트 스타일: ko 11(10px) / ko 12 / ko 14 / ko 16 / ko header 2(18) / ko header(20)
+      // / ko 14 inter / ko 16 inter / en cap / num 12
       fontSize: {
+        'ko-10': ['10px', { lineHeight: '17.6px', letterSpacing: '-0.344px' }],
         'ko-12': ['12px', { lineHeight: '17.6px', letterSpacing: '-0.344px' }],
         'ko-14': ['14px', { lineHeight: '17.6px', letterSpacing: '-0.344px' }],
         'ko-16': ['16px', { lineHeight: '24px', letterSpacing: '-0.6px' }],
+        'ko-18': ['18px', { lineHeight: '28px', letterSpacing: '0.38px' }],
         'ko-20': ['20px', { lineHeight: '34px', letterSpacing: '0.38px' }],
         'en-12': ['12px', { lineHeight: '15px' }],
         'en-14': ['14px', { lineHeight: '17px' }],
         'en-16': ['16px', { lineHeight: '28px', letterSpacing: '0.38px' }],
+        // Figma num 12: 숫자·짧은 단위 (홈 '12 일 기록')
+        'num-12': ['12px', { lineHeight: '17.6px', letterSpacing: '-0.344px' }],
       },
     },
   },

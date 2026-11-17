@@ -76,7 +76,7 @@ Figma 기준 토큰을 `tailwind.config.js` 에 등록했습니다.
 
 - 컬러: `main`, `main-soft`, `ink`, `ink-soft`, `ink-faint`, `line`, `bg`, `brand-10`~`brand-100`
 - 폰트: `font-ko` / `font-ko-medium` (Noto Sans KR), `font-en` / `font-en-medium` (Inter)
-- 크기: `text-ko-12` / `text-ko-14` / `text-ko-16` / `text-en-14` / `text-en-16` (행간·자간 포함)
+- 크기: `text-ko-10` / `text-ko-12` / `text-ko-14` / `text-ko-16` / `text-ko-18` / `text-ko-20` / `text-en-12` / `text-en-14` / `text-en-16` / `text-num-12` (행간·자간 포함)
 
 ```tsx
 import { Button, Checkbox, Header, TextField } from '@/components'

@@ -33,13 +33,13 @@ export function PastRecordCard({
           {record.body}
         </Text>
         <View className="flex-row items-center gap-[6.7px]">
-          <Text className="font-ko text-[8px] leading-[11.8px] text-ink-soft">
+          <Text className="font-ko text-[8px] leading-[11.8px] tracking-[-0.23px] text-ink-soft">
             {formatDotDate(record.date)}
           </Text>
           {record.place ? (
             <>
-              <Text className="font-ko text-[8px] leading-[11.8px] text-ink-faint">•</Text>
-              <Text className="font-ko text-[8px] leading-[11.8px] text-ink-soft" numberOfLines={1}>
+              <Text className="font-ko text-[8px] leading-[11.8px] tracking-[-0.23px] text-ink-faint">•</Text>
+              <Text className="font-ko text-[8px] leading-[11.8px] tracking-[-0.23px] text-ink-soft" numberOfLines={1}>
                 {record.place}
               </Text>
             </>
