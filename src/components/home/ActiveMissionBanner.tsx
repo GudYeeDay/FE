@@ -28,7 +28,7 @@ export function ActiveMissionBanner({
     >
       <MissionBadgeIcon width={26} height={26} />
       <View className="flex-1">
-        <Text className="font-ko text-[10px] leading-[17.6px] tracking-[-0.344px] text-ink">
+        <Text className="font-ko text-ko-10 text-ink">
           진행중인 굳이
         </Text>
         <Text className="font-ko-medium text-ko-14 text-ink" numberOfLines={1}>

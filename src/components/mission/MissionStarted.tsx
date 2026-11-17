@@ -12,7 +12,7 @@ export function MissionStarted({ title, onGoHome }: { title: string; onGoHome: (
         <View className="h-[98px] w-[98px] items-center justify-center">
           <CheckCircleIcon width={83.67} height={83.67} />
         </View>
-        <Text className="mt-6 font-ko-bold text-ko-20 text-[#0D0D0D]">미션을 시작했어요</Text>
+        <Text className="mt-6 font-ko-bold text-ko-20 text-ink">미션을 시작했어요</Text>
         <Text className="mt-2.5 font-en text-[12px] leading-[22px] tracking-[-0.43px] text-ink-soft">
           {title}
         </Text>
