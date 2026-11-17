@@ -79,6 +79,11 @@
     "scheme": "gudyeeday",
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "67dfbb0c-5840-4145-b593-70b2f9be80c7"
+      }
     }
   }
 }
