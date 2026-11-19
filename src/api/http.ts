@@ -5,7 +5,7 @@ import type { ApiResponse, AuthSession } from '@/api/types'
 
 const REMOTE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ??
-  'http://ec2-15-164-237-188.ap-northeast-2.compute.amazonaws.com'
+  'https://api.localy-maker.shop'
 
 const ACCESS_KEY = 'gyd.accessToken'
 const REFRESH_KEY = 'gyd.refreshToken'
