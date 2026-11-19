@@ -60,11 +60,17 @@ export type AuthSession = {
   userId: number
   name: string
   email: string
-  provider: 'LOCAL' | 'GOOGLE'
+  provider: 'LOCAL' | 'GOOGLE' | 'APPLE'
   accessToken: string
   refreshToken: string
   accessTokenExpiresIn: number
 }
+
+/** POST /api/auth/login/apple 응답. 처음 가입한 계정이면 isNewUser */
+export type AppleLoginResponse = Pick<
+  AuthSession,
+  'userId' | 'name' | 'email' | 'provider' | 'accessToken' | 'refreshToken'
+> & { isNewUser: boolean }
 
 export type Profile = {
   name: string

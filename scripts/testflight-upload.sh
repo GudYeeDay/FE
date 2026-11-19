@@ -60,6 +60,15 @@ xcodebuild archive \
 
 [ -d "$ARCHIVE" ] || { echo "아카이브 실패. 로그: $OUT/archive.log" >&2; exit 1; }
 
+# 서명 없이 만든 앱에는 권한(entitlements)이 없어서, 내보내기에서 서명해도 Apple 로그인·푸시 권한이 빠진다.
+# 임시 서명(-)으로 권한을 먼저 박아 두면 내보내기가 그 권한을 그대로 배포 서명에 옮긴다
+APP="$ARCHIVE/Products/Applications/GudYeeDay.app"
+ENTITLEMENTS="$ROOT/ios/GudYeeDay/GudYeeDay.entitlements"
+find "$APP/Frameworks" -maxdepth 1 \( -name "*.framework" -o -name "*.dylib" \) -exec codesign --force --sign - {} \; 2>/dev/null || true
+codesign --force --sign - --entitlements "$ENTITLEMENTS" "$APP"
+echo "▶ 앱 권한"
+codesign -d --entitlements - --xml "$APP" 2>/dev/null | plutil -p - || true
+
 cat > "$OUT/ExportOptions.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
