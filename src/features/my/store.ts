@@ -28,7 +28,11 @@ type MyState = {
 }
 
 const ACCOUNT_KEY = 'gyd.account'
-const PROVIDER: Record<AuthSession['provider'], LoginProvider> = { LOCAL: 'email', GOOGLE: 'google' }
+const PROVIDER: Record<AuthSession['provider'], LoginProvider> = {
+  LOCAL: 'email',
+  GOOGLE: 'google',
+  APPLE: 'apple',
+}
 const DEFAULT_STATE: MyState = {
   email: '',
   provider: 'email',
