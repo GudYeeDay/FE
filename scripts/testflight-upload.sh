@@ -30,7 +30,7 @@ ARCHIVE="$OUT/GudYeeDay.xcarchive"
 [ -d "$WORKSPACE" ] || { echo "ios/ 가 없어요. 먼저 npx expo prebuild --platform ios" >&2; exit 1; }
 
 # 로컬 .env.local(목 서버 주소 등)이 번들에 섞이지 않게 배포 서버 주소를 고정한다
-export EXPO_PUBLIC_API_BASE_URL="http://ec2-15-164-237-188.ap-northeast-2.compute.amazonaws.com"
+export EXPO_PUBLIC_API_BASE_URL="https://api.localy-maker.shop"
 export LANG=en_US.UTF-8
 
 AUTH=(

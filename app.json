@@ -14,12 +14,7 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false,
-          "NSAllowsLocalNetworking": true,
-          "NSExceptionDomains": {
-            "ec2-15-164-237-188.ap-northeast-2.compute.amazonaws.com": {
-              "NSExceptionAllowsInsecureHTTPLoads": true
-            }
-          }
+          "NSAllowsLocalNetworking": true
         }
       },
       "usesAppleSignIn": true
