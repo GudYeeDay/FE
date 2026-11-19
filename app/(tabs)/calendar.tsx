@@ -1,5 +1,5 @@
-import { useMemo, useRef, type ComponentRef } from 'react'
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
+import { useMemo, useState } from 'react'
+import { ActivityIndicator, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 
@@ -9,46 +9,48 @@ import { useMyProfile } from '@/features/my/api'
 import { colors } from '@/theme'
 
 /**
- * Figma: 캘린더. 가입한 달부터 이번 달까지 이어서 보여주고, 처음엔 이번 달이 보이게 맨 아래로 내린다.
- * 시작 달은 기획 확정 전이라 가입한 달로 둔다 (프로필의 가입 일수로 계산)
+ * Figma: 캘린더 (화살표 버전).
+ * 가입한 달부터 이번 달까지 넘길 수 있고, 처음엔 이번 달을 보여준다.
  */
 export default function CalendarScreen() {
   const router = useRouter()
   const profile = useMyProfile()
   const months = useMemo(() => monthsSinceSignup(profile.data?.date ?? 1), [profile.data?.date])
   const { days, isPending } = useCalendar(profile.data ? months : [])
-  const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null)
+  /** null 이면 이번 달(목록의 마지막). 화살표를 누르면 숫자로 바뀐다 */
+  const [pickedIndex, setPickedIndex] = useState<number | null>(null)
+
+  const lastIndex = months.length - 1
+  const index =
+    lastIndex < 0 ? -1 : Math.min(pickedIndex === null ? lastIndex : pickedIndex, lastIndex)
+  const current = index >= 0 ? months[index] : null
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
       <View className="px-[22px] pt-[23px]">
         <Text className="font-ko-bold text-ko-20 text-ink">캘린더</Text>
-        <Text className="mt-2 font-en text-en-14 text-ink">기록한 낭만 {days.size}개</Text>
+        <Text className="mt-2 font-en text-en-14 text-ink">
+          기록한 낭만 <Text className="text-main">{days.size}</Text>개
+        </Text>
       </View>
 
-      {profile.isPending || isPending ? (
+      {profile.isPending || isPending || !current ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={colors.ink.faint} />
         </View>
       ) : (
-        <ScrollView
-          ref={scrollRef}
-          className="mt-[29px]"
-          contentContainerClassName="gap-14 pb-28"
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
-        >
-          {months.map(({ year, month }, i) => (
-            <MonthGrid
-              key={`${year}-${month}`}
-              year={year}
-              month={month}
-              showYear={i === 0 || month === 1}
-              recordsByDate={days}
-              onPressDay={(day) => router.push(`/feed/${day.date}`)}
-            />
-          ))}
-        </ScrollView>
+        <View className="mt-[29px] flex-1">
+          <MonthGrid
+            year={current.year}
+            month={current.month}
+            recordsByDate={days}
+            onPressDay={(day) => router.push(`/feed/${day.date}`)}
+            canPrevMonth={index > 0}
+            canNextMonth={index < lastIndex}
+            onPrevMonth={() => setPickedIndex(Math.max(0, index - 1))}
+            onNextMonth={() => setPickedIndex(Math.min(lastIndex, index + 1))}
+          />
+        </View>
       )}
     </SafeAreaView>
   )
