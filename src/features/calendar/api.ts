@@ -36,7 +36,15 @@ async function fetchMonth({ year, month }: CalendarMonth): Promise<CalendarDay[]
   })
 }
 
-/** 달마다 따로 불러와서 날짜 → 칸으로 합친다 */
+/** 한 달 불러오기 상태. 화면은 보고 있는 달만 기다리고, 실패하면 그 달만 다시 부른다 */
+export type CalendarMonthStatus = {
+  isPending: boolean
+  isError: boolean
+  error: unknown
+  refetch: () => unknown
+}
+
+/** 달마다 따로 불러와서 날짜 → 칸으로 합친다. months 와 같은 순서로 달별 상태도 준다 */
 export function useCalendar(months: CalendarMonth[]) {
   const signedIn = useSignedIn()
   return useQueries({
@@ -49,8 +57,27 @@ export function useCalendar(months: CalendarMonth[]) {
   })
 }
 
-function combineMonths(results: { data?: CalendarDay[]; isPending: boolean }[]) {
+function combineMonths(
+  results: {
+    data?: CalendarDay[]
+    isPending: boolean
+    isError: boolean
+    error: unknown
+    refetch: () => unknown
+  }[],
+) {
   const days = new Map<string, CalendarDay>()
   for (const r of results) for (const day of r.data ?? []) days.set(day.date, day)
-  return { days, isPending: results.some((r) => r.isPending) }
+  const statuses: CalendarMonthStatus[] = results.map(({ isPending, isError, error, refetch }) => ({
+    isPending,
+    isError,
+    error,
+    refetch,
+  }))
+  return {
+    days,
+    statuses,
+    /** 모든 달을 다 받았을 때만 true. 전체 기록 수는 이때 보여준다 */
+    isComplete: results.every((r) => !r.isPending && !r.isError),
+  }
 }

@@ -1,8 +1,10 @@
 import { Image, Pressable, Text, View, useWindowDimensions } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 
+import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import type { CalendarDay } from '@/features/calendar/api'
 import { cn } from '@/lib/cn'
+import { colors } from '@/theme'
 
 const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일']
 const MONTH_NAMES = [
@@ -27,20 +29,33 @@ type Props = {
   year: number
   /** 1~12 */
   month: number
-  /** 해의 첫 달이거나 목록의 첫 달이면 "2026 • September" 처럼 연도를 붙인다 */
-  showYear: boolean
   /** 'YYYY-MM-DD' → 그날 사진 */
   recordsByDate: Map<string, CalendarDay>
   onPressDay?: (day: CalendarDay) => void
+  /** 있으면 달 제목 오른쪽에 이전/다음 화살표를 보여준다 */
+  onPrevMonth?: () => void
+  onNextMonth?: () => void
+  canPrevMonth?: boolean
+  canNextMonth?: boolean
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
 
 /** Figma: 캘린더의 한 달. 월요일 시작 7칸, 기록이 있는 날은 사진. */
-export function MonthGrid({ year, month, showYear, recordsByDate, onPressDay }: Props) {
+export function MonthGrid({
+  year,
+  month,
+  recordsByDate,
+  onPressDay,
+  onPrevMonth,
+  onNextMonth,
+  canPrevMonth = false,
+  canNextMonth = false,
+}: Props) {
   const { width } = useWindowDimensions()
   const tileWidth = (width - SIDE_PADDING * 2 - COLUMN_GAP * 6) / 7
   const tileHeight = tileWidth * (58.67 / 44)
+  const showNav = !!(onPrevMonth || onNextMonth)
 
   const daysInMonth = new Date(year, month, 0).getDate()
   const leadingBlanks = (new Date(year, month - 1, 1).getDay() + 6) % 7 // 월=0
@@ -53,9 +68,35 @@ export function MonthGrid({ year, month, showYear, recordsByDate, onPressDay }: 
 
   return (
     <View className="px-5">
-      <Text className="font-en-medium text-[20px] leading-[24px] text-ink">
-        {showYear ? `${year} • ${MONTH_NAMES[month - 1]}` : MONTH_NAMES[month - 1]}
-      </Text>
+      <View className="flex-row items-center justify-between">
+        <Text className="font-en-medium text-[20px] leading-[24px] text-ink">
+          {year} • {MONTH_NAMES[month - 1]}
+        </Text>
+        {showNav ? (
+          <View className="flex-row items-center gap-1">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="이전 달"
+              disabled={!canPrevMonth}
+              hitSlop={8}
+              onPress={onPrevMonth}
+              className={cn('p-1', !canPrevMonth && 'opacity-30')}
+            >
+              <ChevronLeftIcon width={24} height={24} color={colors.ink.DEFAULT} />
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="다음 달"
+              disabled={!canNextMonth}
+              hitSlop={8}
+              onPress={onNextMonth}
+              className={cn('p-1', !canNextMonth && 'opacity-30')}
+            >
+              <ChevronRightIcon width={24} height={24} color={colors.ink.DEFAULT} />
+            </Pressable>
+          </View>
+        ) : null}
+      </View>
 
       <View className="mt-[30px] flex-row" style={{ gap: COLUMN_GAP }}>
         {WEEKDAYS.map((d) => (
