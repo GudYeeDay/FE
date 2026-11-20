@@ -14,6 +14,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { SessionProvider, useSession } from '@/features/auth/session'
 import { queryClient } from '@/lib/query-client'
 import { useAppStateFocus } from '@/hooks/useAppState'
+import { usePushNotifications } from '@/features/notification/push'
 import '../global.css'
 
 SplashScreen.preventAutoHideAsync()
@@ -45,6 +46,7 @@ export default function RootLayout() {
 /** 로그인 전에는 (auth) 화면만, 로그인 후에는 탭 화면만 접근 가능 */
 function RootNavigator() {
   const { isRestoring, isSignedIn } = useSession()
+  usePushNotifications(isSignedIn)
 
   // 저장된 토큰을 읽기 전에 그리면 로그인 화면이 잠깐 보였다가 홈으로 바뀐다
   useEffect(() => {
