@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 
@@ -39,7 +39,12 @@ export default function CalendarScreen() {
           <ActivityIndicator color={colors.ink.faint} />
         </View>
       ) : (
-        <View className="mt-[29px] flex-1">
+        // 6주짜리 달은 작은 화면(iPhone SE 등)에서 마지막 줄이 탭바에 가려서 스크롤로 감싼다
+        <ScrollView
+          className="mt-[29px] flex-1"
+          contentContainerClassName="pb-6"
+          showsVerticalScrollIndicator={false}
+        >
           <MonthGrid
             year={current.year}
             month={current.month}
@@ -50,7 +55,7 @@ export default function CalendarScreen() {
             onPrevMonth={() => setPickedIndex(Math.max(0, index - 1))}
             onNextMonth={() => setPickedIndex(Math.min(lastIndex, index + 1))}
           />
-        </View>
+        </ScrollView>
       )}
     </SafeAreaView>
   )
