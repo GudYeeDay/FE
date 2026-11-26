@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'r
 
 import { apiFetch, restoreTokens, setTokens, useAuthStatus } from '@/api/http'
 import { myActions } from '@/features/my/store'
+import { unregisterPushToken } from '@/features/notification/push'
 import { queryClient } from '@/lib/query-client'
 
 type Session = {
@@ -31,6 +32,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       isRestoring: status === 'restoring',
       isSignedIn: status === 'signedIn',
       signOut: async () => {
+        await unregisterPushToken()
         await apiFetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
         setTokens(null, null)
         myActions.clear()

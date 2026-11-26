@@ -15,9 +15,16 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false,
           "NSAllowsLocalNetworking": true
-        }
+        },
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       },
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "entitlements": {
+        "aps-environment": "production"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -67,11 +74,16 @@
         {
           "android": {
             "usesCleartextTraffic": true
+          },
+          "ios": {
+            "useFrameworks": "dynamic"
           }
         }
       ],
       "expo-status-bar",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging"
     ],
     "scheme": "gudyeeday",
     "experiments": {
