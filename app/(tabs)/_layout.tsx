@@ -3,7 +3,9 @@ import { Tabs, useRouter } from 'expo-router'
 
 import { BottomTabBar } from '@/components'
 import { MissionRecommendModal } from '@/components/mission/MissionRecommendModal'
+import { TAB_BAR_OVERLAP } from '@/components/navigation/BottomTabBar'
 import { useActiveMission } from '@/features/mission/api'
+import { colors } from '@/theme'
 
 export default function TabsLayout() {
   const router = useRouter()
@@ -13,7 +15,12 @@ export default function TabsLayout() {
   return (
     <>
       <Tabs
-        screenOptions={{ headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          // 탭바가 화면 아래를 TAB_BAR_OVERLAP 만큼 덮으므로 그만큼 비워 둔다.
+          // 비운 곳은 탭바의 투명한 띠·가운데 홈으로 보이는 자리라 화면과 같은 흰색으로 칠한다
+          sceneStyle: { paddingBottom: TAB_BAR_OVERLAP, backgroundColor: colors.white },
+        }}
         // 진행중 미션처럼 숨은 탭에서 뒤로 가면 직전 탭으로 돌아가게 한다
         backBehavior="history"
         tabBar={(props) => (

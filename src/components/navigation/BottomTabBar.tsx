@@ -46,6 +46,12 @@ const SHADOW_PAD = 8
  * 34 기준 추가 여백 10 → 아이콘 아래 26, 홈 인디케이터(아래 ~8~13)와는 13 이상 떨어진다.
  */
 const INSET_OVERLAP = 24
+/**
+ * 탭바 위쪽의 투명한 부분(배경 시작 전 띠 + 가운데 파인 홈) 높이.
+ * 이만큼 화면(scene) 위로 겹쳐 올려서, 투명한 곳에 화면 배경·그림자가 그대로 비치게 한다.
+ * 겹친 만큼 화면 쪽에 아래 여백(TabsLayout 의 sceneStyle)을 줘서 내용 위치는 그대로 둔다.
+ */
+export const TAB_BAR_OVERLAP = BG_TOP + 40.4
 
 const TAB_ICONS: Record<string, FC<SvgProps>> = {
   index: TabHomeIcon,
@@ -113,7 +119,7 @@ export function BottomTabBar({
   }
 
   return (
-    <View style={{ height: BAR_HEIGHT + extraBottom }}>
+    <View style={{ height: BAR_HEIGHT + extraBottom, marginTop: -TAB_BAR_OVERLAP }}>
       <TabBarBackground width={width} bottomInset={extraBottom} />
       <View className="flex-1 flex-row" style={{ paddingBottom: extraBottom }}>
         {left.map(renderTab)}
@@ -164,7 +170,7 @@ function SpinningLoadingIcon() {
 function TabBarBackground({ width, bottomInset }: { width: number; bottomInset: number }) {
   const c = width / 2
   const top = BG_TOP
-  const notch = BG_TOP + 40.4 // 홈의 가장 깊은 지점
+  const notch = TAB_BAR_OVERLAP // 홈의 가장 깊은 지점
   const bottom = BAR_HEIGHT + bottomInset
 
   const d = [
