@@ -81,6 +81,8 @@ export type Profile = {
   complete: number
   /** 시작했지만 아직 완료하지 않은 미션 수 */
   left: number
+  /** 애플 계정 연동 여부. true 면 탈퇴 전에 애플 로그인을 다시 해서 받은 코드를 보내야 한다 */
+  appleLinked?: boolean
 }
 
 export type WeeklyPhotoDay = {

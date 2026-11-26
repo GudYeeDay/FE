@@ -9,8 +9,11 @@ type Session = {
   /** 저장된 토큰을 아직 읽는 중. 이때는 스플래시를 유지한다 */
   isRestoring: boolean
   isSignedIn: boolean
-  /** 서버 로그아웃(재발급 토큰 폐기)은 실패해도 기기의 토큰은 지운다 */
-  signOut: () => Promise<void>
+  /**
+   * 서버 로그아웃(재발급 토큰 폐기)은 실패해도 기기의 토큰은 지운다.
+   * local: 서버에는 알리지 않고 기기만 정리한다 (회원 탈퇴 뒤에는 서버가 이미 토큰을 지웠다)
+   */
+  signOut: (options?: { local?: boolean }) => Promise<void>
 }
 
 const SessionContext = createContext<Session | null>(null)
@@ -31,9 +34,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     () => ({
       isRestoring: status === 'restoring',
       isSignedIn: status === 'signedIn',
-      signOut: async () => {
-        await unregisterPushToken()
-        await apiFetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+      signOut: async ({ local = false }: { local?: boolean } = {}) => {
+        if (!local) {
+          await unregisterPushToken()
+          await apiFetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+        }
         setTokens(null, null)
         myActions.clear()
         queryClient.clear()
