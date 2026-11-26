@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 
 import { ActiveMissionBanner } from '@/components/home/ActiveMissionBanner'
+import { MissionRecommendModal } from '@/components/mission/MissionRecommendModal'
 import { PastRecordCard } from '@/components/home/PastRecordCard'
 import { WeekStrip } from '@/components/home/WeekStrip'
 import { BellIcon } from '@/components/icons'
@@ -17,6 +19,7 @@ export default function HomeScreen() {
   const { data, isPending, isError, error, refetch } = useHomeSummary()
   const activeMission = useActiveMission().data
   const hasNewNotification = data?.hasUnreadNotification ?? false
+  const [recommendOpen, setRecommendOpen] = useState(false)
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-white">
@@ -67,7 +70,14 @@ export default function HomeScreen() {
           <>
             <View className="mt-4">
               {/* Figma 주석: 주별 사진·지난 낭만들 사진을 누르면 그날의 데일리 피드로 이동 */}
-              <WeekStrip week={data.week} onPressDay={(date) => router.push(`/feed/${date}`)} />
+              <WeekStrip
+                week={data.week}
+                onPressDay={(date) => router.push(`/feed/${date}`)}
+                // 탭바 가운데 버튼과 같다: 진행 중인 미션이 있으면 그 화면, 없으면 미션 추천
+                onPressAdd={() =>
+                  activeMission ? router.push('/mission/active') : setRecommendOpen(true)
+                }
+              />
             </View>
 
             <View className="mt-5 px-5">
@@ -110,6 +120,8 @@ export default function HomeScreen() {
           />
         </View>
       ) : null}
+
+      <MissionRecommendModal visible={recommendOpen} onClose={() => setRecommendOpen(false)} />
     </SafeAreaView>
   )
 }
