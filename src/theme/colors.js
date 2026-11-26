@@ -4,6 +4,8 @@ module.exports = {
   ink: { DEFAULT: '#1C1C1A', soft: '#918C80', faint: '#B9B4A6' },
   line: '#E7E7E7',
   bg: '#FAFAFA',
+  // 홈 이번 주 띠의 빈 칸 배경·글자 (Figma Field/Card)
+  empty: { DEFAULT: '#F1F1F1', text: '#D7D7D7' },
   white: '#FFFFFF',
   brand: {
     10: '#FFECED',

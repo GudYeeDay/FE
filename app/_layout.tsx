@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import * as SplashScreen from 'expo-splash-screen'
 import { useFonts } from 'expo-font'
-import { Inter_400Regular, Inter_500Medium } from '@expo-google-fonts/inter'
+import { Inter_400Regular, Inter_500Medium, Inter_800ExtraBold } from '@expo-google-fonts/inter'
 import {
   NotoSansKR_400Regular,
   NotoSansKR_500Medium,
@@ -28,6 +28,7 @@ export default function RootLayout() {
     NotoSansKR_700Bold,
     Inter_400Regular,
     Inter_500Medium,
+    Inter_800ExtraBold,
   })
 
   // 폰트 로드 전에는 스플래시 유지 (폰트 없이 그려진 뒤 깜빡이는 것 방지)

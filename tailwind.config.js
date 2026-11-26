@@ -15,6 +15,7 @@ module.exports = {
         'ko-bold': ['NotoSansKR_700Bold'],
         en: ['Inter_400Regular'],
         'en-medium': ['Inter_500Medium'],
+        'en-extrabold': ['Inter_800ExtraBold'],
       },
       // Figma 텍스트 스타일: ko 11(10px) / ko 12 / ko 14 / ko 16 / ko header 2(18) / ko header(20)
       // / ko 14 inter / ko 16 inter / en cap / num 12
@@ -29,6 +30,7 @@ module.exports = {
         'en-14': ['14px', { lineHeight: '17px' }],
         'en-16': ['16px', { lineHeight: '28px', letterSpacing: '0.38px' }],
         // Figma num 12: 숫자·짧은 단위 (홈 '12 일 기록')
+        'num-24': ['24px', { lineHeight: '29px' }],
         'num-12': ['12px', { lineHeight: '17.6px', letterSpacing: '-0.344px' }],
       },
     },
