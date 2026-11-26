@@ -30,6 +30,11 @@ const DONE_AUTO_CLOSE_MS = 2000
 type Props = {
   action: AccountAction | null
   onCancel: () => void
+  /**
+   * 확인을 누르면 부른다. true 를 돌려주면 완료 안내를 띄우고, false 면 그대로 멈춘다
+   * (회원 탈퇴 API 처럼 서버 결과를 기다려야 할 때). 없으면 바로 완료 안내로 간다
+   */
+  onConfirm?: (action: AccountAction) => Promise<boolean>
   /** 완료 안내까지 닫힌 뒤 호출. 여기서 세션을 끝낸다 */
   onDone: () => void
 }
@@ -38,8 +43,19 @@ type Props = {
  * Figma: 로그아웃/회원탈퇴 확인 → 완료 안내.
  * 모달을 연달아 띄우면 iOS에서 두 번째 모달이 안 뜰 수 있어 한 Modal 안에서 내용만 바꾼다.
  */
-export function AccountDialog({ action, onCancel, onDone }: Props) {
+export function AccountDialog({ action, onCancel, onConfirm, onDone }: Props) {
   const [confirmed, setConfirmed] = useState<AccountAction | null>(null)
+  const [pending, setPending] = useState(false)
+
+  const confirm = async (target: AccountAction) => {
+    if (pending) return
+    if (onConfirm) {
+      setPending(true)
+      const ok = await onConfirm(target).finally(() => setPending(false))
+      if (!ok) return
+    }
+    setConfirmed(target)
+  }
   const done = !!action && confirmed === action
 
   useEffect(() => {
@@ -72,8 +88,8 @@ export function AccountDialog({ action, onCancel, onDone }: Props) {
             cancelLabel="취소"
             confirmLabel={copy.confirmLabel}
             onCancel={onCancel}
-            // 실제 로그아웃은 완료 안내가 닫힌 뒤 onDone 에서 한다 (회원탈퇴는 API 가 없어 아직 막아 둠)
-            onConfirm={() => setConfirmed(action)}
+            // 실제 로그아웃은 완료 안내가 닫힌 뒤 onDone 에서 한다
+            onConfirm={() => action && confirm(action)}
           />
         ) : null}
         {copy && done ? (
