@@ -9,14 +9,15 @@ import { FeedItem, type AnchorRect } from '@/components/record/FeedItem'
 import { FeedMenu } from '@/components/record/FeedMenu'
 import { Dialog } from '@/components/ui/Dialog'
 import { useMyProfile } from '@/features/my/api'
-import { useDailyFeed, useDeleteRecord } from '@/features/record/api'
+import { useDailyFeed, useDeleteRecord, useSetCoverRecord } from '@/features/record/api'
 import type { MissionRecord } from '@/features/record/types'
 import { colors } from '@/theme'
 
 /**
  * Figma: 데일리 피드 / 피드 여러개인 경우 / 데일리 피드 - 캘린더.
  * 그날 남긴 기록을 위아래로 이어서 보여준다. 최근 기록이 위.
- * 대표 사진은 가장 최근 기록 (직접 지정하는 API 가 아직 없다)
+ * 대표 사진(캘린더에 나오는 사진)은 서버가 정한다. 기본은 그날 가장 최근 기록이고,
+ * 대표가 아닌 기록의 "대표 사진" 버튼을 누르면 그 기록으로 바꾼다
  * 닫기: 기록 저장 직후에 열렸으면 홈으로, 그 밖에는 이전 화면(홈·캘린더)으로.
  */
 export default function DailyFeedScreen() {
@@ -25,6 +26,14 @@ export default function DailyFeedScreen() {
   const { data: dayRecords = [], isPending, isError, error } = useDailyFeed(date)
   const nickname = useMyProfile().data?.name ?? ''
   const deleteRecord = useDeleteRecord()
+  const setCover = useSetCoverRecord()
+
+  const changeCover = (record: MissionRecord) => {
+    if (setCover.isPending) return
+    setCover.mutate(record.id, {
+      onError: (e) => Alert.alert('대표 사진을 바꾸지 못했어요', errorText(e)),
+    })
+  }
 
   const [menu, setMenu] = useState<{ record: MissionRecord; anchor: AnchorRect } | null>(null)
   const [deleting, setDeleting] = useState<MissionRecord | null>(null)
@@ -67,7 +76,8 @@ export default function DailyFeedScreen() {
               key={record.id}
               record={record}
               nickname={nickname}
-              isCover={i === 0}
+              isCover={record.isCover === true}
+              onPressCover={record.isCover ? undefined : () => changeCover(record)}
               onPressMore={(anchor) => setMenu({ record, anchor })}
               onClose={i === 0 ? close : undefined}
             />

@@ -10,6 +10,8 @@ export type MissionRecord = {
   /** YYYY-MM-DD */
   date: string
   photo: { uri: string }
+  /** 그날의 대표 사진(캘린더에 나오는 사진). 데일리 피드 기록에만 있다 */
+  isCover?: boolean
 }
 
 /** 기록 작성·수정 화면에서 고른 사진. 새로 고른 사진만 업로드한다 */

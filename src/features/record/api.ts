@@ -14,6 +14,7 @@ export const toRecord = (r: CompleteMissionResponse): MissionRecord => ({
   place: r.location ?? '',
   date: r.completeAt,
   photo: { uri: r.imageUrl },
+  isCover: r.represent === true,
 })
 
 /** 기록이 바뀌면 함께 다시 불러올 화면들 */
@@ -97,6 +98,19 @@ export function useUpdateRecord() {
       )
       return toRecord(res.result)
     },
+    onSuccess: () => invalidateRecords(queryClient),
+  })
+}
+
+/**
+ * 그날의 대표 사진(캘린더에 나오는 사진)을 이 기록으로 바꾼다. 같은 날의 기존 대표는 서버가 해제한다.
+ * 응답에 바뀐 기록이 없어서 피드·캘린더·홈을 다시 불러온다
+ */
+export function useSetCoverRecord() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) =>
+      apiFetch<ApiResponse<string>>(`/api/complete/updateRepresent/${id}`, { method: 'PATCH' }),
     onSuccess: () => invalidateRecords(queryClient),
   })
 }
