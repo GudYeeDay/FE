@@ -120,6 +120,8 @@ export type CompleteMissionResponse = {
   /** YYYY-MM-DD */
   completeAt: string
   content: string | null
+  /** 그날의 대표 사진이면 true. 하루에 최대 1개. 이 필드가 생기기 전 기록은 false */
+  represent?: boolean
 }
 
 /** 서버 DTO 필드가 대문자로 시작해서 그대로 내려온다. 소문자로 고쳐질 때를 대비해 둘 다 받는다 */

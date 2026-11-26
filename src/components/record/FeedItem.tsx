@@ -13,7 +13,7 @@ type Props = {
   record: MissionRecord
   nickname: string
   isCover: boolean
-  /** 대표 사진 지정. 서버 API 가 없어 지금은 넘기지 않는다 (가장 최근 기록이 대표) */
+  /** 대표 사진으로 지정. 이미 대표인 기록에는 넘기지 않는다 */
   onPressCover?: () => void
   /** 더보기 버튼의 화면 위치를 넘겨서 메뉴를 그 아래에 띄운다 */
   onPressMore: (anchor: AnchorRect) => void
